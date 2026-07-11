@@ -1,0 +1,2089 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Daybreak — Program Roadmap</title>
+<style>
+  :root{
+    --green:#0D4B3B; --green-800:#083A2E; --green-900:#062A21;
+    --teal:#589992; --lavender:#CD9ACD; --sky:#DBEAF4; --sky-300:#ECF3F8;
+    --line:#E5E9E7; --gray:#D9D9D9;
+    --ok:#0D4B3B; --ok-soft:#D4E3DD; --ok-bright:#3FA06B;
+    --watch:#CFA33A; --watch-soft:#F7EED1;
+    --risk:#CF6B4D; --risk-soft:#F7DFD4;
+    --sansHead:'Segoe UI','Open Sans',sans-serif;
+    --sansBody:Calibri,Carlito,'Segoe UI',sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff;color:#000;font-family:var(--sansBody);font-size:15px;line-height:1.5;}
+  h1,h2,h3,h4{font-family:var(--sansHead);font-weight:700;margin:0;text-wrap:balance;}
+  .eyebrow{font-family:var(--sansHead);font-weight:700;text-transform:uppercase;letter-spacing:.12em;font-size:12px;color:var(--lavender);}
+
+  header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);}
+  .bar{max-width:1360px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+  .brand{display:flex;align-items:center;gap:12px;cursor:pointer;}
+  .logo{width:34px;height:34px;border-radius:8px;background:var(--green);color:#fff;display:grid;place-items:center;font-family:var(--sansHead);font-weight:700;font-size:18px;}
+  .brand h1{color:var(--green);font-size:19px;line-height:1.1;}
+  .brand .sub{font-size:12px;color:#5b6b66;}
+  .spacer{flex:1;}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .btn{font-family:var(--sansHead);font-weight:700;font-size:13px;border-radius:999px;border:1.5px solid var(--green);background:#fff;color:var(--green);padding:8px 16px;cursor:pointer;transition:background .16s ease,color .16s ease;}
+  .btn:hover{background:var(--green);color:#fff;}
+  .btn--solid{background:var(--green);color:#fff;}
+  .btn--solid:hover{background:var(--green-800);}
+  .btn--ghost{border-color:var(--line);color:#5b6b66;}
+  .btn--ghost:hover{background:var(--sky-300);color:var(--green);}
+  .sync{font-size:12px;color:#5b6b66;display:inline-flex;align-items:center;gap:6px;}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--ok-bright);display:inline-block;}
+  .dot.saving{background:var(--watch);}
+  .dot.off{background:var(--risk);}
+
+  .modeswitch{display:inline-flex;border:1.5px solid var(--green);border-radius:999px;overflow:hidden;}
+  .modeswitch button{font-family:var(--sansHead);font-weight:700;font-size:12px;border:none;background:#fff;color:var(--green);padding:7px 14px;cursor:pointer;}
+  .modeswitch button.on{background:var(--green);color:#fff;}
+
+  nav.tabs{max-width:1360px;margin:0 auto;padding:0 24px;display:flex;gap:4px;flex-wrap:wrap;}
+  .tab{font-family:var(--sansHead);font-weight:700;font-size:14px;color:#5b6b66;background:none;border:none;border-bottom:3px solid transparent;padding:12px 14px;cursor:pointer;}
+  .tab:hover{color:var(--green);}
+  .tab.active{color:var(--green);border-bottom-color:var(--green);}
+
+  main{max-width:1360px;margin:0 auto;padding:28px 24px 80px;}
+  .panel{display:none;}
+  .panel.active{display:block;}
+  .lead{font-size:18px;line-height:1.45;max-width:900px;color:#1c2a26;}
+  h2.section{color:var(--green);font-size:26px;margin:4px 0 6px;}
+  h3.block{color:var(--green);font-size:18px;margin:26px 0 10px;}
+  p{text-wrap:pretty;}
+
+  .grid{display:grid;gap:14px;}
+  .cards{grid-template-columns:repeat(auto-fit,minmax(190px,1fr));margin:18px 0;}
+  .summary{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin:8px 0 4px;}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:0 2px 6px rgba(11,75,59,.06);}
+  .card.feature{background:var(--sky-300);border:none;}
+  .card .k{font-family:var(--sansHead);font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#5b6b66;}
+  .card .v{font-family:var(--sansHead);font-weight:700;color:var(--green);font-size:24px;margin-top:4px;line-height:1.1;}
+  .card .n{font-size:13px;color:#3a4a44;margin-top:4px;}
+
+  /* Roadmap path */
+  .path{display:flex;flex-wrap:wrap;margin:22px 0 6px;}
+  .tile{position:relative;flex:1 1 180px;min-width:180px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 16px 14px;box-shadow:0 2px 6px rgba(11,75,59,.06);cursor:pointer;transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease;margin:0 20px 10px 0;}
+  .tile:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(11,75,59,.12);border-color:var(--teal);}
+  .tile.current{border-color:var(--green);box-shadow:0 0 0 2px var(--green) inset,0 8px 20px rgba(11,75,59,.12);}
+  .tile .step{font-family:var(--sansHead);font-weight:700;font-size:12px;color:#fff;background:var(--green);width:26px;height:26px;border-radius:50%;display:grid;place-items:center;}
+  .tile.done .step{background:var(--ok-bright);}
+  .tile h4{color:var(--green);font-size:16px;margin:10px 0 2px;}
+  .tile .wk{font-size:12px;color:#5b6b66;}
+  .tile .metric{font-family:var(--sansHead);font-weight:700;color:var(--green);font-size:15px;margin-top:8px;}
+  .tile .metric small{font-family:var(--sansBody);font-weight:400;color:#5b6b66;font-size:12px;display:block;margin-top:2px;}
+  .tile .bararea{height:7px;background:var(--sky);border-radius:999px;margin-top:10px;overflow:hidden;}
+  .tile .barfill{height:100%;background:var(--teal);border-radius:999px;transition:width .3s ease;}
+  .tile .youhere{position:absolute;top:-10px;right:12px;font-family:var(--sansHead);font-weight:700;font-size:10px;letter-spacing:.06em;text-transform:uppercase;background:var(--green);color:#fff;padding:2px 9px;border-radius:999px;}
+  .tile .arrow{position:absolute;right:-16px;top:50%;transform:translateY(-50%);color:var(--gray);font-size:20px;z-index:3;font-weight:700;}
+  @media(max-width:760px){ .tile .arrow{display:none;} .tile{margin-right:0;} }
+
+  .pill{font-family:var(--sansHead);font-weight:700;font-size:11px;padding:3px 10px;border-radius:999px;display:inline-block;}
+  .p-ns{background:#f1f1f1;color:#888;}
+  .p-ip{background:var(--watch-soft);color:#7a5e12;}
+  .p-dn{background:var(--ok-soft);color:var(--green);}
+  select.pstat{font-family:var(--sansHead);font-weight:700;font-size:11px;border-radius:999px;border:1px solid var(--line);padding:4px 9px;cursor:pointer;background:#fff;}
+
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;background:#fff;}
+  th,td{border:1px solid var(--line);padding:9px 10px;vertical-align:top;text-align:left;}
+  thead th{background:var(--green);color:#fff;font-family:var(--sansHead);font-weight:700;position:sticky;top:0;font-size:12.5px;}
+  tbody tr:nth-child(even) td{background:var(--sky-300);}
+  td[contenteditable]:focus,th[contenteditable]:focus,[contenteditable]:focus{outline:none;box-shadow:0 0 0 3px rgba(205,154,205,.45);border-radius:4px;}
+  .num{width:64px;text-align:center;}
+  .rownum{font-family:var(--sansHead);font-weight:700;color:var(--green);text-align:center;width:34px;}
+  ul.q{margin:0;padding-left:16px;}
+  ul.q li{margin-bottom:3px;}
+
+  select.status{font-family:var(--sansHead);font-weight:700;font-size:12px;border-radius:999px;border:1px solid var(--line);padding:5px 8px;cursor:pointer;}
+  .st-open{background:#fff;color:#5b6b66;}
+  .st-prog{background:var(--watch-soft);color:#7a5e12;border-color:var(--watch);}
+  .st-done{background:var(--ok-soft);color:var(--green);border-color:var(--green);}
+  .st-block{background:var(--risk-soft);color:#8a3a24;border-color:var(--risk);}
+  .st-na{background:#f1f1f1;color:#888;}
+
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 4px;}
+  .chip{font-family:var(--sansHead);font-weight:700;font-size:12.5px;border-radius:999px;padding:6px 12px;background:var(--sky);color:var(--green);}
+  .chip b{font-size:14px;}
+
+  .gantt{border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+  .gantt table{font-size:12.5px;}
+  .gantt th.wk{text-align:center;width:52px;}
+  .gantt td.cell{padding:0;height:34px;position:relative;background:#fff;}
+  .gantt tbody tr:nth-child(even) td.cell{background:var(--sky-300);}
+  .gantt .bar{position:absolute;top:6px;bottom:6px;border-radius:6px;color:#fff;font-family:var(--sansHead);font-weight:700;font-size:11px;display:flex;align-items:center;padding-left:8px;white-space:nowrap;overflow:hidden;}
+  .phasecell{min-width:230px;}
+  .miletip{font-size:12px;color:#5b6b66;}
+
+  .callout{background:var(--sky-300);border-left:4px solid var(--lavender);border-radius:10px;padding:14px 16px;margin:16px 0;}
+  .callout h4{color:var(--green);margin-bottom:6px;font-size:15px;}
+  .note{font-size:13px;color:#5b6b66;}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:#5b6b66;margin:10px 0;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .sw{width:14px;height:14px;border-radius:4px;display:inline-block;}
+  .foot{margin-top:26px;font-size:12px;color:#8a968f;border-top:1px solid var(--line);padding-top:12px;}
+  .addrow{margin-top:10px;}
+
+  .phasehead{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:4px;}
+  .phasehead .spacer{flex:1;}
+  .backlink{font-family:var(--sansHead);font-weight:700;font-size:13px;color:var(--teal);background:none;border:none;cursor:pointer;padding:6px 0;}
+  .backlink:hover{color:var(--green);}
+
+  tr.grp td{background:var(--green-900);color:#fff;font-family:var(--sansHead);font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.04em;}
+  td.rc{text-align:center;font-family:var(--sansHead);font-weight:700;font-size:11px;}
+  td.rc-a{background:var(--ok-soft);color:var(--green);}
+  td.rc-r{background:var(--sky);color:var(--green);}
+  td.rc-c{background:#f4e9f6;color:#7a4a86;}
+  td.rc-i{background:#f1f1f1;color:#999;}
+
+  /* editable headers (internal only) */
+  h3.block[contenteditable="true"],h2.section[contenteditable="true"]{outline:1px dashed rgba(13,75,59,.3);outline-offset:3px;border-radius:4px;}
+  .tile .owner{font-family:var(--sansHead);font-weight:700;font-size:11.5px;color:var(--teal);margin-top:6px;}
+  .formwrap{margin:12px 0 6px;}
+  .formwrap iframe{width:100%;min-height:540px;border:1px solid var(--line);border-radius:14px;background:#fff;}
+  .colctl{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 4px;}
+  .colctl label{display:inline-flex;gap:6px;align-items:center;font-family:var(--sansHead);font-weight:700;font-size:12px;color:var(--green);background:var(--sky-300);padding:5px 11px;border-radius:8px;cursor:pointer;}
+  input[type=date]{font-family:var(--sansBody);font-size:12.5px;border:1px solid var(--line);border-radius:6px;padding:3px 5px;color:#1c2a26;}
+  .urlbox{width:100%;max-width:560px;font-family:var(--sansBody);font-size:13px;padding:8px 11px;border:1.5px solid var(--line);border-radius:9px;}
+
+  /* delete-row / delete-column controls (internal only) */
+  .delrow{border:none;background:var(--risk-soft);color:#8a3a24;font-family:var(--sansHead);font-weight:700;font-size:11px;line-height:1;width:18px;height:18px;border-radius:50%;cursor:pointer;margin-right:6px;padding:0;vertical-align:middle;}
+  .delrow:hover{background:var(--risk);color:#fff;}
+  .delcol{border:none;background:rgba(255,255,255,.22);color:#fff;font-weight:700;font-size:10px;line-height:1;width:16px;height:16px;border-radius:50%;cursor:pointer;margin-left:6px;padding:0;}
+  .delcol:hover{background:var(--risk);}
+  th .colhd{display:inline-flex;align-items:center;gap:2px;}
+
+  /* About Daybreak */
+  .about{background:var(--sky-300);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin:14px 0 4px;}
+  .about h4{color:var(--green);font-size:15px;margin-bottom:6px;}
+  .about a{color:var(--teal);font-weight:700;text-decoration:none;}
+  .about a:hover{text-decoration:underline;}
+
+  /* sub-item checkboxes */
+  ul.subs{list-style:none;margin:0;padding:0;}
+  ul.subs li{display:flex;align-items:flex-start;gap:6px;margin-bottom:3px;}
+  ul.subs li input{margin-top:3px;flex:none;}
+  ul.subs li span{flex:1;}
+  ul.subs li span[contenteditable]:focus{outline:none;box-shadow:0 0 0 3px rgba(205,154,205,.45);border-radius:4px;}
+  .subprog{font-size:11px;color:#5b6b66;font-family:var(--sansHead);font-weight:700;margin-top:2px;}
+  .addsub{font-family:var(--sansHead);font-weight:700;font-size:11px;color:var(--teal);background:none;border:none;cursor:pointer;padding:2px 0;}
+  .addsub:hover{color:var(--green);}
+  td.rc.done-y{box-shadow:inset 0 0 0 2px var(--ok-bright);}
+
+  /* meeting-recap textarea */
+  textarea#recapNotes{width:100%;min-height:150px;font-family:var(--sansBody);font-size:14px;padding:11px 13px;border:1.5px solid var(--line);border-radius:12px;resize:vertical;color:#1c2a26;}
+  textarea#recapNotes:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(205,154,205,.35);}
+  .recapform{border:1.5px solid var(--line);border-radius:14px;padding:14px;background:#fff;}
+  .recaprow{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;}
+  .fld{display:flex;flex-direction:column;gap:4px;font-family:var(--sansHead);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:#6b7b76;}
+  .fld.grow{flex:1;min-width:200px;}
+  .fld input{font-family:var(--sansBody);font-size:14px;font-weight:400;text-transform:none;letter-spacing:0;padding:9px 11px;border:1.5px solid var(--line);border-radius:10px;color:#1c2a26;}
+  .fld input:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(205,154,205,.35);}
+  .recaplist{display:flex;flex-direction:column;gap:8px;}
+  .recapcard{border:1.5px solid var(--line);border-radius:12px;padding:10px 13px;background:#fff;display:flex;align-items:flex-start;gap:10px;}
+  .recapcard .rc-main{flex:1;}
+  .recapcard .rc-title{font-family:var(--sansHead);font-weight:700;color:var(--green);}
+  .recapcard .rc-meta{font-size:12px;color:#6b7b76;margin-top:2px;}
+  .recapcard .rc-del{flex:none;border:none;background:none;color:#c0392b;cursor:pointer;font-size:14px;line-height:1;}
+  .eowreport{border:1.5px solid var(--line);border-radius:14px;padding:16px 18px;background:#fff;font-family:var(--sansBody);font-size:14px;color:#1c2a26;white-space:pre-wrap;line-height:1.55;min-height:120px;}
+
+  /* maturity level badges */
+  .lvl{font-family:var(--sansHead);font-weight:700;font-size:11px;padding:3px 10px;border-radius:999px;display:inline-block;white-space:nowrap;}
+  .lvl0{background:#f1f1f1;color:#888;}
+  .lvl1{background:var(--sky);color:var(--green);}
+  .lvl2{background:var(--watch-soft);color:#7a5e12;}
+  .lvl3{background:var(--ok-soft);color:var(--green);box-shadow:inset 0 0 0 1.5px var(--ok-bright);}
+  .lvl4{background:#5b21b6;color:#fff;box-shadow:inset 0 0 0 1.5px #7c3aed;}
+  /* framework group header row inside the maturity tracker */
+  tr.fwrow td{background:var(--green);color:#fff;font-family:var(--sansHead);font-weight:700;letter-spacing:.02em;padding:8px 10px;}
+  tr.fwrow .fwpct{float:right;background:rgba(255,255,255,.16);border-radius:999px;padding:2px 12px;font-size:12px;}
+  .sopcell a{color:var(--teal);font-weight:700;white-space:nowrap;text-decoration:none;}
+  .sopcell input{max-width:150px;}
+  td.deliv{font-size:12px;color:#3c4a46;}
+  td.govproc{font-size:12px;color:#3c4a46;font-style:italic;}
+  .lvloptim{margin-left:6px;font-size:10px;color:#7c3aed;font-weight:700;white-space:nowrap;}
+  ul.critlist{list-style:none;margin:0;padding:0;}
+  ul.critlist li{display:flex;align-items:flex-start;gap:6px;margin-bottom:3px;}
+  ul.critlist li input{margin-top:3px;flex:none;}
+  ul.critlist li span{flex:1;}
+  .matstage{font-family:var(--sansHead);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--green);margin:2px 0;}
+
+  /* view mode */
+  body.mode-client .internal-only{display:none!important;}
+  body.mode-internal .client-only{display:none!important;}
+
+  /* EOW passcode lock — hides the tab + panel until unlocked on this device */
+  body.eow-locked .eow-gated{display:none!important;}
+  #btnEowLock{font-size:13px;}
+
+  /* Recap candidate review */
+  .candbox{margin:6px 0 4px;}
+  .candgrp{margin:10px 0 4px;font-family:var(--sansHead);font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--green);}
+  .cand{display:flex;align-items:center;gap:8px;flex-wrap:wrap;border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:6px;background:#fbfdfc;}
+  .cand.added{opacity:.55;background:#f2faf5;}
+  .cand input[type=text]{font-family:var(--sansBody);font-size:13px;padding:6px 8px;border:1.5px solid var(--line);border-radius:8px;}
+  .cand .c-item{flex:1;min-width:200px;}
+  .cand .c-owner{width:120px;}
+  .cand .c-week{width:64px;}
+  .cand select{font-size:12px;padding:5px 6px;border:1.5px solid var(--line);border-radius:8px;}
+  .cand label.esc{font-size:12px;color:#5b6b66;display:flex;align-items:center;gap:3px;}
+  .candsave{margin-top:8px;display:flex;align-items:center;gap:10px;}
+
+  /* Stakeholders & DL badges */
+  .stk-dl{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#fff;background:var(--lavender);border-radius:999px;padding:2px 7px;margin-left:6px;}
+
+  /* Login overlay */
+  #gate{position:fixed;inset:0;z-index:100;background:#fff;display:flex;align-items:center;justify-content:center;}
+  .gatecard{width:360px;max-width:90vw;border:1px solid var(--line);border-radius:20px;padding:30px 28px;box-shadow:0 18px 40px rgba(11,75,59,.10);text-align:center;}
+  .gatecard .logo{margin:0 auto 14px;width:44px;height:44px;font-size:22px;}
+  .gatecard h2{color:var(--green);font-size:20px;margin-bottom:4px;}
+  .gatecard p{font-size:13px;color:#5b6b66;margin:0 0 18px;}
+  .gatecard input{width:100%;font-family:var(--sansBody);font-size:15px;padding:11px 13px;border:1.5px solid var(--line);border-radius:10px;margin-bottom:12px;}
+  .gatecard input:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(205,154,205,.45);}
+  .gatecard .btn{width:100%;padding:11px;}
+  .gateerr{color:var(--risk);font-size:13px;min-height:18px;margin-top:8px;}
+  .hidden{display:none!important;}
+
+  @media print{
+    header,nav.tabs,.actions,.addrow,#gate,.backlink,.arrow{display:none!important;}
+    .panel{display:block!important;page-break-after:always;}
+    body{font-size:11px;}
+  }
+</style>
+</head>
+<body class="mode-internal">
+
+<!-- LOGIN GATE -->
+<div id="gate">
+  <div class="gatecard">
+    <div class="logo">B</div>
+    <h2>Daybreak Roadmap</h2>
+    <p>Booth Managed Solutions · Confidential.<br>Enter the team password to continue.</p>
+    <input id="gatePw" type="password" placeholder="Team password" autocomplete="current-password" />
+    <button class="btn btn--solid" id="gateBtn">Open roadmap</button>
+    <div class="gateerr" id="gateErr"></div>
+  </div>
+</div>
+
+<header class="hidden" id="appHeader">
+  <div class="bar">
+    <div class="brand" id="brandHome" title="Back to roadmap">
+      <div class="logo">B</div>
+      <div>
+        <h1>Daybreak — Program Roadmap</h1>
+        <div class="sub">Booth Managed Solutions · Patient Support · 5 FTE · Cebu</div>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <div class="actions">
+      <div class="modeswitch" title="Switch what's shown">
+        <button id="modeClient">Client view</button>
+        <button id="modeInternal" class="on">Internal view</button>
+      </div>
+      <span class="sync" id="syncNote"><span class="dot" id="syncDot"></span><span id="syncTxt">Connecting…</span></span>
+      <button class="btn btn--ghost internal-only" id="btnImport">Load file</button>
+      <button class="btn btn--ghost" id="btnExport">Save file</button>
+      <button class="btn btn--ghost" id="btnPrint">Print</button>
+      <button class="btn btn--ghost internal-only" id="btnReset">Reset</button>
+      <button class="btn btn--ghost internal-only" id="btnEowLock" title="Your private End-of-Week report">🔒 EOW</button>
+      <button class="btn btn--solid" id="btnSignout">Sign out</button>
+    </div>
+  </div>
+  <nav class="tabs" id="tabs"></nav>
+</header>
+
+<main class="hidden" id="appMain">
+
+  <!-- ROADMAP HOME -->
+  <section class="panel" id="p-roadmap">
+    <div class="eyebrow">Program roadmap · signing to steady state</div>
+    <h2 class="section">Daybreak launch roadmap</h2>
+    <p class="lead client-only">Your Daybreak program at a glance — from Discovery through Go-live to steady-state support. Click any phase to open its detail.</p>
+    <p class="lead internal-only">One live view of how we stand up the Daybreak patient-support account — from Discovery through Go-live to steady-state BAU. Click any phase to open its detail. Everything is editable and syncs to the team in real time.</p>
+
+    <div class="about" id="aboutBox"></div>
+
+    <div class="grid cards summary" id="summaryCards"></div>
+
+    <div class="path" id="pathRow"></div>
+    <p class="note">Tip: click a phase card to jump into its detail. Change a phase's status right on the card — the summary and progress update instantly.</p>
+
+    <div class="internal-only">
+      <h3 class="block" data-hkey="ownerRollup">Open items by owner</h3>
+      <p class="note">Rolled up live from the deployment tracker. A line item counts as <b>Done</b> only when its status is Done and every sub-item is checked. Overdue = target date passed and not yet done.</p>
+      <div class="tablewrap">
+        <table id="ownerRollupTbl">
+          <thead><tr><th style="width:200px">Owner</th><th class="num">Done</th><th class="num">In progress</th><th class="num">Not started</th><th class="num">Overdue</th><th class="num">Total</th><th style="width:150px">Completion %</th></tr></thead>
+          <tbody id="ownerRollupBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <h3 class="block" data-hkey="master">Master timeline — signing to go-live</h3>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--green)"></span> Recruitment &amp; enablement</span>
+      <span><span class="sw" style="background:var(--teal)"></span> Training</span>
+      <span><span class="sw" style="background:var(--lavender)"></span> Nesting / production ramp</span>
+      <span><span class="sw" style="background:var(--ok-bright)"></span> Go-live</span>
+    </div>
+    <div class="gantt">
+      <table id="ganttTbl"><thead><tr id="ganttHead"></tr></thead><tbody id="ganttBody"></tbody></table>
+    </div>
+    <div class="addrow internal-only"><button class="btn btn--ghost" id="btnAddGantt">+ Add timeline row</button></div>
+
+    <div class="internal-only">
+      <h3 class="block" data-hkey="support">Reference &amp; support library</h3>
+      <p class="note">Important internal files and links — add the file name, the link, and what it's for.</p>
+      <div class="tablewrap">
+        <table id="supportTbl">
+          <thead><tr><th style="width:220px">File / resource</th><th style="width:320px">Link</th><th>What it's for</th></tr></thead>
+          <tbody id="supportBody"></tbody>
+        </table>
+      </div>
+      <div class="addrow"><button class="btn btn--ghost" id="btnAddSupport">+ Add link</button></div>
+    </div>
+
+    <div class="internal-only">
+      <h3 class="block" data-hkey="stakeholders">Stakeholders &amp; client contacts</h3>
+      <p class="note">Everyone involved in the program — Booth-side and client-side — plus any group distribution lists. Add an email so you can reach the right people fast.</p>
+      <p class="note">Use the ▲ ▼ arrows to arrange contacts by hierarchy.</p>
+      <div class="tablewrap">
+        <table id="stakeholderTbl">
+          <thead><tr id="stakeholderHead"></tr></thead>
+          <tbody id="stakeholderBody"></tbody>
+        </table>
+      </div>
+      <div class="addrow"><button class="btn btn--ghost" id="btnAddStakeholder">+ Add contact</button> <button class="btn btn--ghost" id="btnAddDL">+ Add distribution list</button> <button class="btn btn--ghost" id="btnAddStakeholderCol">+ Add column</button></div>
+    </div>
+
+    <div class="internal-only">
+      <h3 class="block" data-hkey="teamLinks">Daybreak Drive — team working files</h3>
+      <p class="note">Central repository for what the team is actively building. <b>Everyone adds the links they're working on in the Daybreak Drive here</b> so nothing lives in a private folder. Add who owns it, what it is, and the Drive link.</p>
+      <div class="tablewrap">
+        <table id="teamLinkTbl">
+          <thead><tr>
+            <th style="width:150px">Team member</th>
+            <th style="width:280px">What you're working on</th>
+            <th style="width:300px">Drive link</th>
+            <th style="width:120px">Updated</th>
+          </tr></thead>
+          <tbody id="teamLinkBody"></tbody>
+        </table>
+      </div>
+      <div class="addrow"><button class="btn btn--ghost" id="btnAddTeamLink">+ Add my working link</button></div>
+    </div>
+  </section>
+
+  <!-- DISCOVERY -->
+  <section class="panel" id="p-discovery">
+    <div class="phasehead">
+      <div><div class="eyebrow">Phase 1 · Discovery</div><h2 class="section">Learn the business</h2></div>
+      <span class="spacer"></span>
+      <span id="status-discovery"></span>
+      <button class="backlink" data-back>← Roadmap</button>
+    </div>
+    <p class="lead">Thirteen topics take us from business objectives through workflow, training, quality, risk and the partnership definition. We pre-filled everything from the deal conversations — the open work is confirming it with Daybreak and filling the gaps.</p>
+    <div class="chips" id="statChips"></div>
+    <div class="tablewrap">
+      <table id="trackerTbl">
+        <thead><tr id="trackerHead"></tr></thead>
+        <tbody id="trackerBody"></tbody>
+      </table>
+    </div>
+    <div class="addrow internal-only"><button class="btn btn--ghost" id="btnAddTracker">+ Add topic</button> <button class="btn btn--ghost" id="btnAddTrackerCol">+ Add column</button></div>
+    <div class="internal-only">
+      <p class="note" style="margin-top:14px"><b>Columns clients can see</b> — tick to show a column on the Client view (internal view always shows everything):</p>
+      <div class="colctl" id="discColCtl"></div>
+    </div>
+
+    <h3 class="block" data-hkey="discForm">Documents &amp; files</h3>
+    <p class="lead client-only" id="discFormLead">Please upload any documents or files that support your responses above.</p>
+    <div class="internal-only" style="margin:6px 0 10px">
+      <p class="note">Paste your Google Form <b>embed</b> link so clients can upload files here (in your form: Send → &lt;&gt; → copy the URL). Uploaded files land in your Google Drive. Leave blank to hide this section from clients.</p>
+      <input class="urlbox" id="discFormUrl" type="url" placeholder="https://docs.google.com/forms/d/e/…/viewform?embedded=true" />
+    </div>
+    <div class="formwrap" id="discFormMount"></div>
+  </section>
+
+  <!-- SET UP -->
+  <section class="panel" id="p-setup">
+    <div class="phasehead">
+      <div><div class="eyebrow">Phase 2 · Set Up</div><h2 class="section">Build the foundation</h2></div>
+      <span class="spacer"></span>
+      <span id="status-setup"></span>
+      <button class="backlink" data-back>← Roadmap</button>
+    </div>
+    <p class="lead">Everything that has to exist before a single new hire starts: SOPs reviewed, the trainer certified via Train-the-Trainer, the quality framework loaded into RubriCore, the governance cadences designed, and recruitment run for 5 FTE plus buffer.</p>
+    <div class="grid cards summary internal-only" id="setupCards"></div>
+    <div class="tablewrap">
+      <table id="setupTbl">
+        <thead>
+          <tr>
+            <th style="width:230px">Setup workstream</th>
+            <th class="num internal-only">SOM</th><th class="num internal-only">Team Lead</th><th class="num internal-only">QA</th><th class="num internal-only">Trainer</th>
+            <th class="num internal-only">Row total</th>
+            <th style="width:320px">What's included</th>
+          </tr>
+        </thead>
+        <tbody id="setupBody"></tbody>
+        <tfoot id="setupFoot"></tfoot>
+      </table>
+    </div>
+    <div class="addrow internal-only"><button class="btn btn--ghost" id="btnAddSetup">+ Add workstream</button></div>
+    <div class="callout internal-only"><h4>Shared-resource read</h4><p class="note" id="sharedRead">—</p></div>
+    <h3 class="block">Operating cadences we design here</h3>
+    <div class="tablewrap">
+      <table id="cadenceTbl"><thead><tr></tr></thead><tbody id="cadenceBody"></tbody></table>
+    </div>
+    <div class="addrow internal-only"><button class="btn btn--ghost" id="btnAddCadence">+ Add row</button> <button class="btn btn--ghost" id="btnAddCadenceCol">+ Add column</button></div>
+    <div class="internal-only">
+      <p class="note" style="margin-top:8px"><b>Columns clients can see</b> — tick to show a column on the Client view (internal view always shows everything):</p>
+      <div class="colctl" id="cadenceCtl"></div>
+    </div>
+    <p class="foot internal-only">Hours assume one Team Leader, one QA and one Trainer shared with another program, plus Marj as program lead. Recruitment sourcing hours (Talent Acquisition) are tracked separately.</p>
+  </section>
+
+  <!-- DEPLOYMENT -->
+  <section class="panel" id="p-deployment">
+    <div class="phasehead">
+      <div><div class="eyebrow">Phase 3 · Deployment</div><h2 class="section">Train &amp; nest the team</h2></div>
+      <span class="spacer"></span>
+      <span id="status-deployment"></span>
+      <button class="backlink" data-back>← Roadmap</button>
+    </div>
+    <p class="lead">Weeks 5–8. New hires go through onboarding, product and systems training, then nesting — hands-on production under supervision — until they're certified to independent production.</p>
+    <div class="tablewrap">
+      <table id="deployTbl">
+        <thead>
+          <tr>
+            <th style="width:230px">Workstream</th>
+            <th class="num internal-only">SOM</th><th class="num internal-only">Team Lead</th><th class="num internal-only">QA</th><th class="num internal-only">Trainer</th>
+            <th class="num internal-only">Row total</th>
+            <th style="width:320px">What's included</th>
+          </tr>
+        </thead>
+        <tbody id="deployBody"></tbody>
+        <tfoot id="deployFoot"></tfoot>
+      </table>
+    </div>
+    <div class="addrow internal-only"><button class="btn btn--ghost" id="btnAddDeploy">+ Add workstream</button></div>
+    <div class="callout"><h4>Certification gate</h4><p class="note">Nobody moves to independent production without passing the certification built during Set Up. Nesting runs weeks 7–8 with live monitoring, feedback loops and QA sampling before sign-off.</p></div>
+
+    <h3 class="block" data-hkey="deployTracker">Deployment tracker</h3>
+    <p class="lead">The operational launch checklist — signing through hypercare. Change any status and the summary recalculates instantly.</p>
+    <div class="grid cards summary" id="dtSummary"></div>
+    <div class="tablewrap" style="margin-top:6px">
+      <table id="dtPhaseTbl">
+        <thead><tr><th style="width:200px">Phase</th><th class="num">Done</th><th class="num">In progress</th><th class="num">Not started</th><th style="width:200px">Complete</th></tr></thead>
+        <tbody id="dtPhaseBody"></tbody>
+      </table>
+    </div>
+    <div class="tablewrap" style="margin-top:14px">
+      <table id="deployTrackerTbl">
+        <thead>
+          <tr>
+            <th style="width:34px">#</th>
+            <th style="width:56px">Wave</th>
+            <th style="width:130px">Category</th>
+            <th style="width:170px">Checklist item</th>
+            <th style="width:120px" class="internal-only">Owner</th>
+            <th style="width:120px">Status</th>
+            <th style="width:140px">Target date</th>
+            <th style="width:260px">Sub-items / to review</th>
+            <th style="width:180px" class="internal-only">Progress notes</th>
+          </tr>
+        </thead>
+        <tbody id="deployTrackerBody"></tbody>
+      </table>
+    </div>
+    <div class="addrow internal-only"><button class="btn btn--ghost" id="btnAddDT">+ Add checklist item</button></div>
+
+    <h3 class="block" data-hkey="raci">RACI — program delivery</h3>
+    <p class="note" id="raciLegend"></p>
+    <div class="tablewrap">
+      <table id="raciTbl" class="raci"><thead><tr id="raciHead"></tr></thead><tbody id="raciBody"></tbody></table>
+    </div>
+  </section>
+
+  <!-- GO LIVE / HYPERCARE -->
+  <section class="panel" id="p-golive">
+    <div class="phasehead">
+      <div><div class="eyebrow">Phase 4 · Go Live / Hypercare</div><h2 class="section">Launch &amp; stabilise</h2></div>
+      <span class="spacer"></span>
+      <span id="status-golive"></span>
+      <button class="backlink" data-back>← Roadmap</button>
+    </div>
+    <p class="lead">Week 9. The team goes live on real patient volume with intensive support — daily issue triage with Daybreak, close KPI watch, and fast fixes until the operation is stable.</p>
+    <div class="tablewrap">
+      <table id="goliveTbl">
+        <thead>
+          <tr>
+            <th style="width:230px">Workstream</th>
+            <th class="num internal-only">SOM</th><th class="num internal-only">Team Lead</th><th class="num internal-only">QA</th><th class="num internal-only">Trainer</th>
+            <th class="num internal-only">Row total</th>
+            <th style="width:320px">What's included</th>
+          </tr>
+        </thead>
+        <tbody id="goliveBody"></tbody>
+        <tfoot id="goliveFoot"></tfoot>
+      </table>
+    </div>
+    <div class="addrow internal-only"><button class="btn btn--ghost" id="btnAddGolive">+ Add workstream</button></div>
+    <div class="callout"><h4>Hypercare exit</h4><p class="note">Hypercare ends when KPIs hold against SLA for a sustained window and the daily client sync steps down to weekly. That hand-off into steady state is the start of BAU.</p></div>
+
+    <h3 class="block" data-hkey="readiness">Program readiness checklist — pre-launch</h3>
+    <p class="lead">Every area must be ready before client-facing work begins. Update status as items close.</p>
+    <div class="grid cards summary" id="readySummary"></div>
+    <div class="tablewrap">
+      <table id="readyTbl">
+        <thead><tr><th style="width:160px">Area</th><th>Criteria</th><th style="width:160px">Owner</th><th style="width:130px">Status</th></tr></thead>
+        <tbody id="readyBody"></tbody>
+      </table>
+    </div>
+
+    <h3 class="block" data-hkey="gonogo">Go / No-Go authority</h3>
+    <div class="chips">
+      <span class="chip">Go/No-Go owner: <b id="gngOwner">—</b></span>
+      <span class="chip">Final approver: <b id="gngApprover">—</b></span>
+    </div>
+    <p class="note">Stage-gate criteria — all must be green for go-live.</p>
+    <div class="tablewrap">
+      <table id="gngTbl">
+        <thead><tr><th style="width:160px">Area</th><th>Criteria</th><th style="width:160px">Owner</th><th style="width:130px">Status</th></tr></thead>
+        <tbody id="gngBody"></tbody>
+      </table>
+    </div>
+    <h3 class="block" data-hkey="decision">Decision authority</h3>
+    <div class="tablewrap">
+      <table id="gngDecTbl"><thead><tr></tr></thead><tbody id="gngDecBody"></tbody></table>
+    </div>
+    <div class="addrow internal-only"><button class="btn btn--ghost" id="btnAddDecision">+ Add row</button> <button class="btn btn--ghost" id="btnAddDecisionCol">+ Add column</button></div>
+    <div class="internal-only">
+      <p class="note" style="margin-top:8px"><b>Columns clients can see</b> — tick to show a column on the Client view (internal view always shows everything):</p>
+      <div class="colctl" id="decisionCtl"></div>
+    </div>
+  </section>
+
+  <!-- BAU -->
+  <section class="panel" id="p-bau">
+    <div class="phasehead">
+      <div><div class="eyebrow">Phase 5 · BAU</div><h2 class="section">Run, review, grow</h2></div>
+      <span class="spacer"></span>
+      <span id="status-bau"></span>
+      <button class="backlink" data-back>← Roadmap</button>
+    </div>
+    <p class="lead">Steady-state operation: the review rhythm that keeps performance visible, the move to Transaction-Based Pricing, and the continuous-improvement engine that grows the account.</p>
+    <div class="tablewrap">
+      <table id="bauTbl"><thead><tr></tr></thead><tbody id="bauBody"></tbody></table>
+    </div>
+    <div class="addrow internal-only"><button class="btn btn--ghost" id="btnAddBau">+ Add workstream</button> <button class="btn btn--ghost" id="btnAddBauCol">+ Add column</button></div>
+    <div class="internal-only">
+      <p class="note" style="margin-top:8px"><b>Columns clients can see</b> — tick to show a column on the Client view (internal view always shows everything):</p>
+      <div class="colctl" id="bauCtl"></div>
+    </div>
+    <div class="callout"><h4>The pricing move</h4><p class="note">We start on an FTE-cost model and transition to Transaction-Based Pricing within a maximum of 120 days of signing, via a contract addendum, once real volume and KPIs are in hand. That's the trigger for scaling the partnership.</p></div>
+  </section>
+
+  <!-- ACTION TRACKER (meeting recap) -->
+  <section class="panel internal-only" id="p-actions">
+    <div class="phasehead">
+      <div><div class="eyebrow">Internal · Meeting recap</div><h2 class="section">Meeting recap → action tracker</h2></div>
+      <span class="spacer"></span>
+      <button class="backlink" data-back>← Roadmap</button>
+    </div>
+    <p class="lead">Upload or paste a meeting transcript and it surfaces the <b>likely action items</b> and <b>strategic milestones</b> for you to review. Nothing is added automatically — check the ones that matter and click <b>Add</b> to push each into the tracker (or a milestone onto the <b>Gantt timeline</b>). Edit the wording, owner or type before you add. Save the meeting to your recap history when you're done. Everything runs right here in your browser.</p>
+
+    <h3 class="block">Upload recap</h3>
+    <div class="recapform">
+      <div class="recaprow">
+        <label class="fld"><span>Meeting date</span><input type="date" id="recapDate"></label>
+        <label class="fld"><span>Uploaded by</span><input type="text" id="recapBy" placeholder="e.g. Marj"></label>
+        <label class="fld grow"><span>Title (optional)</span><input type="text" id="recapTitle" placeholder="e.g. Weekly ManCom — Jul 10"></label>
+      </div>
+      <label class="fld"><span>Transcript</span>
+        <textarea id="recapNotes" placeholder="Paste the transcript here, or upload a file below…&#10;e.g.&#10;- Marj to send the revised SLA to the client&#10;- Del: needs to confirm VPN access by Friday&#10;- Risk: hiring pipeline behind — escalate to COO&#10;- Milestone: pilot go-live targeted for Week 8"></textarea>
+      </label>
+      <div class="addrow">
+        <button class="btn btn--solid" id="btnExtract">Find actions &amp; milestones</button>
+        <button class="btn btn--ghost" id="btnUploadRecap">Upload file</button>
+        <span class="note">Accepts .txt, .vtt, .docx</span>
+        <span class="note" id="extractMsg"></span>
+      </div>
+    </div>
+
+    <div id="recapCandidates" class="candbox"></div>
+
+    <h3 class="block">Recap history</h3>
+    <div id="recapList" class="recaplist"><p class="note">No recaps saved yet.</p></div>
+
+    <h3 class="block">Internal action tracker</h3>
+    <div class="chips" id="actionChips"></div>
+    <div class="tablewrap">
+      <table id="actionTbl">
+        <thead><tr>
+          <th style="width:34px">#</th>
+          <th>Action item</th>
+          <th style="width:130px">Owner</th>
+          <th style="width:120px">Type</th>
+          <th style="width:130px">Status</th>
+          <th style="width:84px">Escalate</th>
+          <th style="width:200px">Notes</th>
+        </tr></thead>
+        <tbody id="actionBody"></tbody>
+      </table>
+    </div>
+    <div class="addrow"><button class="btn btn--ghost" id="btnAddAction">+ Add action</button></div>
+  </section>
+
+  <!-- END OF WEEK REPORT -->
+  <section class="panel internal-only eow-gated" id="p-eow">
+    <div class="phasehead">
+      <div><div class="eyebrow">Internal · Weekly digest</div><h2 class="section">End-of-Week Report</h2></div>
+      <span class="spacer"></span>
+      <button class="backlink" data-back>← Roadmap</button>
+    </div>
+    <p class="lead">A one-click summary of where the program stands — actions by status, anything escalated, upcoming milestones, and readiness. Generate it any time, copy it, or let the scheduled Friday job drop it into your inbox as a draft.</p>
+    <div class="addrow">
+      <button class="btn btn--solid" id="btnGenEow">Generate report</button>
+      <button class="btn btn--ghost" id="btnCopyEow">Copy</button>
+      <span class="note" id="eowMsg"></span>
+    </div>
+    <div id="eowReport" class="eowreport" data-eow>Click <b>Generate report</b> to build this week’s summary.</div>
+  </section>
+
+  <!-- PERFORMANCE STATUS -->
+  <section class="panel internal-only" id="p-performance">
+    <div class="phasehead">
+      <div><div class="eyebrow">Governance · Performance</div><h2 class="section">Performance status</h2></div>
+      <span class="spacer"></span>
+      <button class="backlink" data-back>← Roadmap</button>
+    </div>
+    <p class="lead" id="perfNote"></p>
+    <div class="callout" id="perfEmpty"><h4>Ready for your KPIs &amp; SLAs</h4><p class="note">Once the SLA / KPI framework is agreed and live data starts flowing, add each metric below — its target, the actual, and where it stands. Update it on your review cadence.</p></div>
+    <div class="tablewrap">
+      <table id="perfTbl">
+        <thead><tr>
+          <th style="width:220px">KPI / SLA</th>
+          <th style="width:130px">Target</th>
+          <th style="width:130px">Actual</th>
+          <th style="width:140px">Status</th>
+          <th>Notes</th>
+        </tr></thead>
+        <tbody id="perfBody"></tbody>
+      </table>
+    </div>
+    <div class="addrow"><button class="btn btn--ghost" id="btnAddPerf">+ Add metric</button></div>
+  </section>
+
+  <!-- PROCESS MATURITY FRAMEWORK -->
+  <section class="panel" id="p-maturity">
+    <div class="phasehead">
+      <div><div class="eyebrow">Governance · Process maturity</div><h2 class="section">Process Maturity Framework</h2></div>
+      <span class="spacer"></span>
+      <button class="backlink" data-back>← Roadmap</button>
+    </div>
+    <p class="lead">One common governance language across all frameworks. Every capability moves through four levels — <b>Documented</b>, <b>Operationalized</b>, <b>Governed</b>, then <b>Optimized</b>. Tick the evidence as each is met; the level is awarded automatically once <em>all</em> criteria for that level (and the ones before it) are checked. <b>Governed</b> is the target — a capability at Governed is 100% mature; <b>Optimized</b> is the bonus stage for continuous improvement.</p>
+
+    <h3 class="block">The model</h3>
+    <div class="tablewrap">
+      <table id="maturityModelTbl">
+        <thead><tr><th style="width:190px">Level</th><th style="width:280px">Definition</th><th>Success criteria</th></tr></thead>
+        <tbody id="maturityModelBody"></tbody>
+      </table>
+    </div>
+
+    <h3 class="block">Process tracker</h3>
+    <div class="grid cards summary" id="maturitySummary"></div>
+    <div class="tablewrap" style="margin-top:6px">
+      <table id="maturityTbl">
+        <thead><tr id="maturityHead"></tr></thead>
+        <tbody id="maturityBody"></tbody>
+      </table>
+    </div>
+    <div class="addrow internal-only"><button class="btn btn--ghost" id="btnAddFramework">+ Add framework</button></div>
+  </section>
+</main>
+
+<input type="file" id="fileInput" accept="application/json" style="display:none" />
+<input type="file" id="recapFile" accept=".txt,.vtt,.docx,text/plain" style="display:none" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { firebaseConfig, SHARED_EMAIL, DOC_PATH } from "./config.js";
+import { DEFAULT } from "./defaults.js";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const ref = doc(db, DOC_PATH.collection, DOC_PATH.id);
+const clone = o => JSON.parse(JSON.stringify(o));
+
+let data = null;
+let unsub = null;
+let pendingRemote = null;
+let writeTimer = null;
+let seeding = false;
+const WEEKS = 9;
+
+const PHASES = [
+  {id:'discovery',  n:'Discovery',           wk:'Weeks 1–4 · parallel'},
+  {id:'setup',      n:'Set Up',              wk:'Weeks 1–4'},
+  {id:'deployment', n:'Deployment',          wk:'Weeks 5–8'},
+  {id:'golive',     n:'Go Live / Hypercare', wk:'Week 9'},
+  {id:'bau',        n:'BAU',                 wk:'Ongoing'}
+];
+
+/* ---------- editing detection ---------- */
+let editing = false;
+document.addEventListener('focusin', e=>{ if(isEditable(e.target)) editing = true; });
+document.addEventListener('focusout', ()=>{ setTimeout(()=>{ editing=false; if(pendingRemote){ applyData(pendingRemote); pendingRemote=null; } }, 150); });
+function isEditable(el){ return el && (el.isContentEditable || el.tagName==='INPUT' || el.tagName==='SELECT' || el.tagName==='TEXTAREA'); }
+
+/* ---------- view mode (per-user, not shared) ---------- */
+function setMode(m){
+  document.body.classList.toggle('mode-client', m==='client');
+  document.body.classList.toggle('mode-internal', m==='internal');
+  document.getElementById('modeClient').classList.toggle('on', m==='client');
+  document.getElementById('modeInternal').classList.toggle('on', m==='internal');
+  try{ localStorage.setItem('daybreak-view', m); }catch(e){}
+  applyEditRights(m);
+  if(data) renderAll();
+}
+document.getElementById('modeClient').addEventListener('click', ()=>setMode('client'));
+document.getElementById('modeInternal').addEventListener('click', ()=>setMode('internal'));
+(function(){ let m='internal'; try{ m=localStorage.getItem('daybreak-view')||'internal'; }catch(e){} setMode(m); })();
+document.body.classList.add('eow-locked');
+
+/* ---------- auth / gate ---------- */
+const gate=document.getElementById('gate'), gateErr=document.getElementById('gateErr');
+function doLogin(){
+  const pw=document.getElementById('gatePw').value;
+  if(!pw){ gateErr.textContent='Enter the team password.'; return; }
+  gateErr.textContent='Checking…';
+  signInWithEmailAndPassword(auth, SHARED_EMAIL, pw)
+    .then(()=>{ gateErr.textContent=''; })
+    .catch(err=>{
+      gateErr.textContent = (err.code==='auth/invalid-credential'||err.code==='auth/wrong-password'||err.code==='auth/invalid-login-credentials')
+        ? 'That password didn’t work.' : ('Sign-in error: '+err.code);
+    });
+}
+document.getElementById('gateBtn').addEventListener('click', doLogin);
+document.getElementById('gatePw').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+
+onAuthStateChanged(auth, user=>{
+  if(user){
+    gate.classList.add('hidden');
+    document.getElementById('appHeader').classList.remove('hidden');
+    document.getElementById('appMain').classList.remove('hidden');
+    startSync();
+  }else{
+    gate.classList.remove('hidden');
+    document.getElementById('appHeader').classList.add('hidden');
+    document.getElementById('appMain').classList.add('hidden');
+    if(unsub){ unsub(); unsub=null; }
+  }
+});
+document.getElementById('btnSignout').addEventListener('click', ()=>signOut(auth));
+
+/* ---------- Firestore sync ---------- */
+function setSync(state){
+  const dot=document.getElementById('syncDot'), txt=document.getElementById('syncTxt');
+  dot.className='dot'+(state==='saving'?' saving':(state==='off'?' off':''));
+  txt.textContent = state==='saving'?'Saving…' : state==='off'?'Offline' : 'Synced';
+}
+function startSync(){
+  if(unsub) return;
+  setSync('saving');
+  unsub = onSnapshot(ref, snap=>{
+    if(!snap.exists()){
+      if(!seeding){ seeding=true; setDoc(ref, clone(DEFAULT)).finally(()=>seeding=false); }
+      return;
+    }
+    const remote = snap.data();
+    setSync('idle');
+    if(editing){ pendingRemote = remote; }
+    else applyData(remote);
+  }, err=>{ setSync('off'); console.error('Firestore error', err); });
+}
+function applyData(d){
+  data = d;
+  ['tracker','setup','cadence','gantt','bau','deployTracker','deployReadiness','supportLinks'].forEach(k=>{ if(!Array.isArray(data[k])) data[k]=clone(DEFAULT[k]); });
+  if(!data.raci || typeof data.raci!=='object') data.raci=clone(DEFAULT.raci);
+  if(!data.goNoGo || typeof data.goNoGo!=='object') data.goNoGo=clone(DEFAULT.goNoGo);
+  if(!data.headers || typeof data.headers!=='object') data.headers=clone(DEFAULT.headers);
+  if(!data.about || typeof data.about!=='object') data.about=clone(DEFAULT.about);
+  if(!Array.isArray(data.discColumns) || !data.discColumns.length) data.discColumns=clone(DEFAULT.discColumns);
+  if(!data.discCols || typeof data.discCols!=='object') data.discCols=clone(DEFAULT.discCols);
+  else Object.keys(DEFAULT.discCols).forEach(k=>{ if(!(k in data.discCols)) data.discCols[k]=DEFAULT.discCols[k]; });
+  data.discColumns.forEach(c=>{ if(!(c.key in data.discCols)) data.discCols[c.key]=true; });
+  if(!data.discForm || typeof data.discForm!=='object') data.discForm=clone(DEFAULT.discForm);
+  // flexible content tables: column defs + client-visibility maps
+  [['cadenceColumns','cadenceCols','cadence'],['bauColumns','bauCols','bau'],['decisionColumns','decisionCols']].forEach(([ck,vk])=>{
+    if(!Array.isArray(data[ck]) || !data[ck].length) data[ck]=clone(DEFAULT[ck]);
+    if(!data[vk] || typeof data[vk]!=='object') data[vk]=clone(DEFAULT[vk]);
+    data[ck].forEach(c=>{ if(!(c.key in data[vk])) data[vk][c.key]=true; });
+  });
+  if(!data.goNoGo.decisions || !Array.isArray(data.goNoGo.decisions)) data.goNoGo.decisions=clone(DEFAULT.goNoGo.decisions);
+  // action tracker
+  if(!Array.isArray(data.actionTracker)) data.actionTracker=clone(DEFAULT.actionTracker);
+  data.actionTracker.forEach(r=>{ if(typeof r.escalate!=='boolean') r.escalate=!!r.escalate; if(!r.type) r.type='BAU'; if(!r.status) r.status='Open'; });
+  // recap history
+  if(!Array.isArray(data.recaps)) data.recaps=[];
+  // stakeholders & client contacts
+  if(!Array.isArray(data.stakeholders)) data.stakeholders=clone(DEFAULT.stakeholders);
+  if(!Array.isArray(data.stakeholderCols)) data.stakeholderCols=clone(DEFAULT.stakeholderCols);
+  data.stakeholders.forEach(s=>{ if(typeof s.group!=='boolean') s.group=!!s.group; if(!s.side) s.side='Internal'; if(typeof s.hours!=='string') s.hours=''; if(!s.extra||typeof s.extra!=='object') s.extra={}; });
+  // Daybreak Drive team working links
+  if(!Array.isArray(data.teamLinks)) data.teamLinks=[];
+  // performance status
+  if(!data.performance || typeof data.performance!=='object') data.performance=clone(DEFAULT.performance);
+  if(typeof data.performance.note!=='string') data.performance.note=DEFAULT.performance.note;
+  if(!Array.isArray(data.performance.kpis)) data.performance.kpis=[];
+  // process maturity (4-level model, grouped into frameworks of functions)
+  if(!data.maturity || typeof data.maturity!=='object') data.maturity=clone(DEFAULT.maturity);
+  // migrate: if stages are missing the new 'governed'/'optimized' keys, reset to the 4-level model
+  const hasNewStages = Array.isArray(data.maturity.stages) && data.maturity.stages.some(s=>s.key==='governed');
+  if(!hasNewStages) data.maturity.stages=clone(DEFAULT.maturity.stages);
+  if(typeof data.maturity.target!=='number') data.maturity.target=DEFAULT.maturity.target;
+  // migrate: old flat "processes" array -> seed the framework model
+  if(!Array.isArray(data.maturity.frameworks)) data.maturity.frameworks=clone(DEFAULT.maturity.frameworks);
+  delete data.maturity.processes;
+  const nrm=(fn)=>{
+    if(typeof fn.name!=='string') fn.name='';
+    ['deliverables','process','owner','sop','notes'].forEach(k=>{ if(typeof fn[k]!=='string') fn[k]=''; });
+    if(!fn.checks || typeof fn.checks!=='object') fn.checks={};
+    data.maturity.stages.forEach(s=>{
+      const n=s.crit.length;
+      if(!Array.isArray(fn.checks[s.key])) fn.checks[s.key]=new Array(n).fill(false);
+      while(fn.checks[s.key].length<n) fn.checks[s.key].push(false);
+      fn.checks[s.key]=fn.checks[s.key].slice(0,n).map(Boolean);
+    });
+  };
+  data.maturity.frameworks.forEach(fw=>{
+    if(typeof fw.name!=='string') fw.name='';
+    if(!Array.isArray(fw.functions)) fw.functions=[];
+    fw.functions.forEach(nrm);
+  });
+  // normalise deployment-tracker sub-items to checkable objects {t,done}
+  data.deployTracker.forEach(r=>{
+    if(!Array.isArray(r.sub)) r.sub=[];
+    r.sub=r.sub.map(s=> (s && typeof s==='object') ? {t:s.t||'',done:!!s.done} : {t:String(s),done:false});
+  });
+  // backfill phase tags / meta for docs seeded before the roadmap model
+  data.setup.forEach((r,i)=>{ if(!r.phase && DEFAULT.setup[i]) r.phase=DEFAULT.setup[i].phase; });
+  data.gantt.forEach((r,i)=>{ if(!r.stage && DEFAULT.gantt[i]) r.stage=DEFAULT.gantt[i].stage; });
+  if(!data.meta || typeof data.meta!=='object') data.meta=clone(DEFAULT.meta);
+  if(typeof data.meta.eowPin!=='string') data.meta.eowPin='';
+  if(!data.meta.phaseStatus) data.meta.phaseStatus=clone(DEFAULT.meta.phaseStatus);
+  PHASES.forEach(p=>{ if(!data.meta.phaseStatus[p.id]) data.meta.phaseStatus[p.id]='Not started'; });
+  if(!data.meta.phaseOwners || typeof data.meta.phaseOwners!=='object') data.meta.phaseOwners=clone(DEFAULT.meta.phaseOwners);
+  renderAll();
+}
+function scheduleSave(){
+  setSync('saving');
+  clearTimeout(writeTimer);
+  writeTimer = setTimeout(()=>{
+    setDoc(ref, clone(data)).then(()=>setSync('idle')).catch(()=>setSync('off'));
+  }, 600);
+}
+
+/* ---------- Tabs / routing ---------- */
+const TABS=[["roadmap","Roadmap"],["discovery","Discovery"],["setup","Set Up"],["deployment","Deployment"],["golive","Go Live / Hypercare"],["bau","BAU"],["maturity","Process Maturity"],["performance","Performance"],["actions","Action Tracker"],["eow","EOW Report"]];
+function goTo(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.id===id));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('p-'+id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+(function buildTabs(){
+  const nav=document.getElementById('tabs'); nav.innerHTML='';
+  TABS.forEach(([id,label],i)=>{
+    const b=document.createElement('button');
+    b.className='tab'+(i===0?' active':'')+((id==='actions'||id==='eow'||id==='performance')?' internal-only':'')+(id==='eow'?' eow-gated':''); b.textContent=label; b.dataset.id=id;
+    b.onclick=()=>goTo(id);
+    nav.appendChild(b);
+  });
+})();
+document.getElementById('brandHome').addEventListener('click',()=>goTo('roadmap'));
+document.querySelectorAll('[data-back]').forEach(b=>b.addEventListener('click',()=>goTo('roadmap')));
+
+/* ---------- status helpers ---------- */
+function discStatus(){
+  const t=data.tracker; if(!t.length) return 'Not started';
+  const done=t.filter(r=>r.status==='Complete').length;
+  if(done===t.length) return 'Complete';
+  if(t.some(r=>r.status==='In progress'||r.status==='Complete')) return 'In progress';
+  return 'Not started';
+}
+function phaseStatus(id){ return id==='discovery'?discStatus():(data.meta.phaseStatus[id]||'Not started'); }
+function phasePct(id){
+  if(id==='discovery'){ const t=data.tracker; return t.length?Math.round(t.filter(r=>r.status==='Complete').length/t.length*100):0; }
+  const s=phaseStatus(id); return s==='Complete'?100:s==='In progress'?50:0;
+}
+function currentPhase(){ for(const p of PHASES){ if(phaseStatus(p.id)!=='Complete') return p.id; } return 'bau'; }
+function pillCls(s){ return s==='Complete'?'p-dn':s==='In progress'?'p-ip':'p-ns'; }
+function statusControl(id){
+  if(id==='discovery'){ const s=document.createElement('span'); const st=discStatus(); s.className='pill '+pillCls(st); s.textContent=st; return s; }
+  const sel=document.createElement('select'); sel.className='pstat';
+  ['Not started','In progress','Complete'].forEach(o=>{const op=document.createElement('option');op.value=o;op.textContent=o;if(o===phaseStatus(id))op.selected=true;sel.appendChild(op);});
+  sel.onclick=e=>e.stopPropagation();
+  sel.onchange=e=>{e.stopPropagation();data.meta.phaseStatus[id]=sel.value;scheduleSave();renderPath();renderSummary();renderPhaseHeads();};
+  return sel;
+}
+function renderPhaseHeads(){
+  PHASES.forEach(p=>{ const el=document.getElementById('status-'+p.id); if(el){ el.innerHTML=''; el.appendChild(statusControl(p.id)); } });
+}
+
+/* ---------- editable section headers ---------- */
+function currentMode(){ return document.body.classList.contains('mode-client') ? 'client' : 'internal'; }
+function applyEditRights(m){
+  m = m || currentMode();
+  document.querySelectorAll('[data-hkey]').forEach(el=>{ el.setAttribute('contenteditable', m==='internal' ? 'true':'false'); });
+}
+function renderHeaders(){
+  if(!data || !data.headers) return;
+  document.querySelectorAll('[data-hkey]').forEach(el=>{
+    const k=el.getAttribute('data-hkey');
+    if(data.headers[k]) el.textContent=data.headers[k];
+    if(!el.dataset.wired){ el.dataset.wired='1';
+      el.addEventListener('input', ()=>{ data.headers[k]=el.textContent.trim(); scheduleSave(); });
+    }
+  });
+  applyEditRights();
+}
+
+/* ---------- summary + roadmap path ---------- */
+function setupTotals(){ let o={pl:0,tl:0,qa:0,tr:0}; data.setup.filter(r=>r.phase==='setup').forEach(r=>{o.pl+=+r.pl||0;o.tl+=+r.tl||0;o.qa+=+r.qa||0;o.tr+=+r.tr||0;}); o.grand=o.pl+o.tl+o.qa+o.tr; return o; }
+function weeksToLive(){ return data.gantt.reduce((m,r)=>Math.max(m,+r.e||0),0)||WEEKS; }
+function renderSummary(){
+  const box=document.getElementById('summaryCards'); box.innerHTML='';
+  const t=data.tracker; const done=t.filter(r=>r.status==='Complete').length;
+  const cur=PHASES.find(p=>p.id===currentPhase());
+  const tot=setupTotals();
+  const cards=[
+    {k:'Current phase', v:cur?cur.n:'—', n:cur?cur.wk:'', cls:''},
+    {k:'Discovery', v:done+'/'+t.length, n:'topics closed', cls:''},
+    {k:'Setup effort', v:tot.grand+' h', n:'Set Up phase · all roles', cls:' internal-only'},
+    {k:'To go-live', v:weeksToLive()+' wks', n:'signing → hypercare', cls:''},
+    {k:'Team', v:'5 FTE', n:'+10–13% buffer', cls:''}
+  ];
+  cards.forEach(c=>{ const d=document.createElement('div'); d.className='card feature'+c.cls; d.innerHTML='<div class="k">'+c.k+'</div><div class="v">'+c.v+'</div><div class="n">'+c.n+'</div>'; box.appendChild(d); });
+}
+function phaseMetric(id){
+  if(id==='discovery'){ const t=data.tracker; return {main:t.filter(r=>r.status==='Complete').length+'/'+t.length+' topics', sub:'closed'}; }
+  if(id==='setup'){ const rows=data.setup.filter(r=>r.phase==='setup'); const h=rows.reduce((a,r)=>a+(+r.pl||0)+(+r.tl||0)+(+r.qa||0)+(+r.tr||0),0); return {main:rows.length+' workstreams', sub:h+' hrs effort', internal:true}; }
+  if(id==='deployment'){ return {main:'Weeks 5–8', sub:'train + nest'}; }
+  if(id==='golive'){ return {main:'Week 9', sub:'launch + hypercare'}; }
+  return {main:'Ongoing', sub:'reviews · TBP · CI'};
+}
+function renderPath(){
+  const row=document.getElementById('pathRow'); row.innerHTML='';
+  const cur=currentPhase();
+  PHASES.forEach((p,i)=>{
+    const st=phaseStatus(p.id), pct=phasePct(p.id);
+    const tile=document.createElement('div');
+    tile.className='tile'+(st==='Complete'?' done':'')+(p.id===cur?' current':'');
+    tile.onclick=()=>goTo(p.id);
+    if(p.id===cur){ const yh=document.createElement('div'); yh.className='youhere'; yh.textContent='You are here'; tile.appendChild(yh); }
+    const head=document.createElement('div'); head.style.display='flex'; head.style.justifyContent='space-between'; head.style.alignItems='center';
+    const step=document.createElement('div'); step.className='step'; step.textContent=(i+1);
+    head.appendChild(step); head.appendChild(statusControl(p.id));
+    tile.appendChild(head);
+    const h=document.createElement('h4'); h.textContent=p.n; tile.appendChild(h);
+    const wk=document.createElement('div'); wk.className='wk'; wk.textContent=p.wk; tile.appendChild(wk);
+    const ow=document.createElement('div'); ow.className='owner internal-only'; ow.appendChild(document.createTextNode('Owner: '));
+    const os=document.createElement('span'); os.contentEditable=true; os.textContent=(data.meta.phaseOwners&&data.meta.phaseOwners[p.id])||'—';
+    os.onclick=e=>e.stopPropagation();
+    os.oninput=()=>{ if(!data.meta.phaseOwners)data.meta.phaseOwners={}; data.meta.phaseOwners[p.id]=os.textContent.trim(); scheduleSave(); };
+    ow.appendChild(os); tile.appendChild(ow);
+    const m=phaseMetric(p.id);
+    const met=document.createElement('div'); met.className='metric';
+    met.innerHTML=m.main+'<small'+(m.internal?' class="internal-only"':'')+'>'+m.sub+'</small>'; tile.appendChild(met);
+    const ba=document.createElement('div'); ba.className='bararea'; const bf=document.createElement('div'); bf.className='barfill'; bf.style.width=pct+'%'; ba.appendChild(bf); tile.appendChild(ba);
+    if(i<PHASES.length-1){ const ar=document.createElement('div'); ar.className='arrow'; ar.textContent='›'; tile.appendChild(ar); }
+    row.appendChild(tile);
+  });
+}
+
+/* ---------- shared cell helpers ---------- */
+const STATUSES=[["Open","st-open"],["In progress","st-prog"],["Complete","st-done"],["Blocked","st-block"],["N/A","st-na"]];
+function cls(s){const m=STATUSES.find(x=>x[0]===s);return m?m[1]:'st-open';}
+function ed(val,cb){const td=document.createElement('td');td.contentEditable=true;td.textContent=val||'';td.oninput=()=>{cb(td.textContent);scheduleSave();};return td;}
+function roleCell(r,key,recalc){const td=document.createElement('td');td.className='num internal-only';td.contentEditable=true;td.textContent=r[key];td.oninput=()=>{r[key]=parseFloat(td.textContent.replace(/[^0-9.]/g,''))||0;recalc();scheduleSave();};return td;}
+// prepend a small delete-row button into a row's first cell (internal only)
+function addDel(firstTd, onDel){
+  const b=document.createElement('button'); b.className='delrow internal-only'; b.title='Delete this row'; b.textContent='✕';
+  b.onclick=e=>{ e.stopPropagation(); onDel(); scheduleSave(); };
+  firstTd.insertBefore(b, firstTd.firstChild);
+}
+
+/* ---------- About / Support library / Owner rollup ---------- */
+function renderAbout(){
+  const box=document.getElementById('aboutBox'); if(!box) return; box.innerHTML='';
+  const h=document.createElement('h4'); h.textContent='About Daybreak'; box.appendChild(h);
+  const p=document.createElement('p'); p.textContent=data.about.text||'';
+  if(currentMode()==='internal'){ p.contentEditable=true; p.oninput=()=>{ data.about.text=p.textContent; scheduleSave(); }; }
+  box.appendChild(p);
+  const url=(data.about.url||'').trim();
+  const wrap=document.createElement('p'); wrap.style.marginTop='6px';
+  if(url){ const a=document.createElement('a'); a.href=url; a.target='_blank'; a.rel='noopener'; a.textContent='Visit thedaybreak.com →'; wrap.appendChild(a); }
+  box.appendChild(wrap);
+  if(currentMode()==='internal'){
+    const lab=document.createElement('div'); lab.className='note'; lab.style.marginTop='6px';
+    lab.appendChild(document.createTextNode('Link URL: '));
+    const inp=document.createElement('input'); inp.className='urlbox'; inp.type='url'; inp.value=data.about.url||''; inp.style.maxWidth='420px';
+    inp.oninput=()=>{ data.about.url=inp.value.trim(); scheduleSave(); };
+    inp.onblur=renderAbout;
+    lab.appendChild(inp); box.appendChild(lab);
+  }
+}
+function renderSupport(){
+  const tb=document.getElementById('supportBody'); if(!tb) return; tb.innerHTML='';
+  data.supportLinks.forEach(r=>{
+    const tr=document.createElement('tr');
+    const nameTd=ed(r.name,v=>r.name=v); tr.appendChild(nameTd);
+    addDel(nameTd, ()=>{ data.supportLinks.splice(data.supportLinks.indexOf(r),1); renderSupport(); });
+    const linkTd=document.createElement('td');
+    const inp=document.createElement('input'); inp.className='urlbox'; inp.type='url'; inp.value=r.url||''; inp.placeholder='https://…'; inp.style.maxWidth='300px';
+    inp.oninput=()=>{ r.url=inp.value.trim(); scheduleSave(); };
+    linkTd.appendChild(inp);
+    if((r.url||'').trim()){ const a=document.createElement('a'); a.href=r.url; a.target='_blank'; a.rel='noopener'; a.textContent=' open ↗'; a.style.color='var(--teal)'; a.style.fontWeight='700'; a.style.whiteSpace='nowrap'; linkTd.appendChild(a); }
+    tr.appendChild(linkTd);
+    tr.appendChild(ed(r.purpose,v=>r.purpose=v));
+    tb.appendChild(tr);
+  });
+}
+function addSupportRow(){ data.supportLinks.push({name:"",url:"",purpose:""}); renderSupport(); scheduleSave(); }
+/* ---------- Stakeholders & client contacts ---------- */
+function moveStakeholder(r,dir){ const a=data.stakeholders; const i=a.indexOf(r); const j=i+dir; if(i<0||j<0||j>=a.length) return; a.splice(i,1); a.splice(j,0,r); renderStakeholders(); scheduleSave(); }
+function renderStakeholders(){
+  const cols=Array.isArray(data.stakeholderCols)?data.stakeholderCols:[];
+  const head=document.getElementById('stakeholderHead');
+  if(head){ head.innerHTML='';
+    [['Name','180px'],['Role','170px'],['Org','130px'],['Side','110px'],['Hours of operation','160px'],['Email','240px']].forEach(([t,w])=>{ const th=document.createElement('th'); th.textContent=t; th.style.width=w; head.appendChild(th); });
+    cols.forEach(c=>{ const th=document.createElement('th'); th.style.minWidth='130px';
+      const sp=document.createElement('span'); sp.textContent=c.label; if(currentMode()==='internal'){ sp.contentEditable=true; sp.oninput=()=>{ c.label=sp.textContent.trim(); scheduleSave(); }; } th.appendChild(sp);
+      if(currentMode()==='internal'){ const x=document.createElement('button'); x.className='delcol'; x.textContent='✕'; x.title='Delete column'; x.onclick=()=>{ data.stakeholderCols.splice(data.stakeholderCols.indexOf(c),1); renderStakeholders(); scheduleSave(); }; th.appendChild(x); }
+      head.appendChild(th);
+    });
+  }
+  const tb=document.getElementById('stakeholderBody'); if(!tb) return; tb.innerHTML='';
+  (data.stakeholders||[]).forEach(r=>{
+    if(!r.extra||typeof r.extra!=='object') r.extra={};
+    const tr=document.createElement('tr');
+    // name cell (reorder arrows + DL badge for group rows) — edit only the name span
+    const nameTd=document.createElement('td');
+    if(currentMode()==='internal'){
+      const arrowCss='border:1px solid var(--line);background:#f4f6f5;color:var(--green);font-size:10px;line-height:1;width:16px;height:16px;border-radius:4px;cursor:pointer;padding:0;margin-right:2px;';
+      const up=document.createElement('button'); up.style.cssText=arrowCss; up.textContent='▲'; up.title='Move up'; up.onclick=()=>moveStakeholder(r,-1); nameTd.appendChild(up);
+      const dn=document.createElement('button'); dn.style.cssText=arrowCss+'margin-right:5px;'; dn.textContent='▼'; dn.title='Move down'; dn.onclick=()=>moveStakeholder(r,1); nameTd.appendChild(dn);
+    }
+    const nm=document.createElement('span'); nm.contentEditable=true; nm.textContent=r.name||'';
+    nm.oninput=()=>{ r.name=nm.textContent.trim(); scheduleSave(); };
+    nameTd.appendChild(nm);
+    if(r.group){ const b=document.createElement('span'); b.className='stk-dl'; b.textContent='DL'; nameTd.appendChild(b); }
+    tr.appendChild(nameTd);
+    addDel(nameTd, ()=>{ data.stakeholders.splice(data.stakeholders.indexOf(r),1); renderStakeholders(); });
+    tr.appendChild(ed(r.role,v=>r.role=v));
+    tr.appendChild(ed(r.org,v=>r.org=v));
+    const sideTd=document.createElement('td');
+    const ssel=document.createElement('select'); ssel.className='pstat';
+    ['Internal','Client'].forEach(o=>{const op=document.createElement('option');op.value=o;op.textContent=o;if(o===(r.side||'Internal'))op.selected=true;ssel.appendChild(op);});
+    ssel.onchange=()=>{ r.side=ssel.value; scheduleSave(); };
+    sideTd.appendChild(ssel); tr.appendChild(sideTd);
+    tr.appendChild(ed(r.hours,v=>r.hours=v));
+    const emTd=document.createElement('td');
+    const inp=document.createElement('input'); inp.type='email'; inp.className='urlbox'; inp.value=r.email||''; inp.placeholder='name@company.com'; inp.style.maxWidth='210px';
+    inp.oninput=()=>{ r.email=inp.value.trim(); scheduleSave(); };
+    emTd.appendChild(inp);
+    if((r.email||'').trim()){ const a=document.createElement('a'); a.href='mailto:'+r.email; a.textContent=' ✉'; a.title='Email'; a.style.color='var(--teal)'; a.style.fontWeight='700'; emTd.appendChild(a); }
+    tr.appendChild(emTd);
+    cols.forEach(c=>{ tr.appendChild(ed(r.extra[c.key]||'', v=>{ r.extra[c.key]=v; })); });
+    tb.appendChild(tr);
+  });
+}
+function addStakeholderRow(group){ data.stakeholders.push({name:"",role:group?"Distribution list":"",org:"",email:"",side:"Internal",group:!!group,hours:"",extra:{}}); renderStakeholders(); scheduleSave(); }
+function addStakeholderCol(){ const label=(prompt('New column name:')||'').trim(); if(!label) return; const key='x'+Date.now().toString(36); if(!Array.isArray(data.stakeholderCols)) data.stakeholderCols=[]; data.stakeholderCols.push({key,label}); renderStakeholders(); scheduleSave(); }
+/* ---------- Daybreak Drive — team working links ---------- */
+function renderTeamLinks(){
+  const tb=document.getElementById('teamLinkBody'); if(!tb) return; tb.innerHTML='';
+  (data.teamLinks||[]).forEach(r=>{
+    const tr=document.createElement('tr');
+    const whoTd=ed(r.who,v=>r.who=v); tr.appendChild(whoTd);
+    addDel(whoTd, ()=>{ data.teamLinks.splice(data.teamLinks.indexOf(r),1); renderTeamLinks(); });
+    tr.appendChild(ed(r.work,v=>r.work=v));
+    const linkTd=document.createElement('td');
+    const inp=document.createElement('input'); inp.className='urlbox'; inp.type='url'; inp.value=r.url||''; inp.placeholder='https://drive.google.com/…'; inp.style.maxWidth='270px';
+    inp.oninput=()=>{ r.url=inp.value.trim(); scheduleSave(); };
+    linkTd.appendChild(inp);
+    if((r.url||'').trim()){ const a=document.createElement('a'); a.href=r.url; a.target='_blank'; a.rel='noopener'; a.textContent=' open ↗'; a.style.color='var(--teal)'; a.style.fontWeight='700'; a.style.whiteSpace='nowrap'; linkTd.appendChild(a); }
+    tr.appendChild(linkTd);
+    const dTd=document.createElement('td');
+    const di=document.createElement('input'); di.type='date'; di.value=r.updated||'';
+    di.onchange=()=>{ r.updated=di.value; scheduleSave(); };
+    dTd.appendChild(di); tr.appendChild(dTd);
+    tb.appendChild(tr);
+  });
+}
+function addTeamLinkRow(){ data.teamLinks.push({who:"",work:"",url:"",updated:new Date().toISOString().slice(0,10)}); renderTeamLinks(); scheduleSave(); }
+/* ---------- Performance status ---------- */
+const PERF_ST=[["On track","st-done"],["At risk","st-prog"],["Off track","st-block"],["No data","st-open"]];
+function perfCls(s){const m=PERF_ST.find(x=>x[0]===s);return m?m[1]:'st-open';}
+function renderPerformance(){
+  const note=document.getElementById('perfNote');
+  if(note){ note.textContent=(data.performance&&data.performance.note)||''; if(currentMode()==='internal'){ note.contentEditable=true; note.oninput=()=>{ data.performance.note=note.textContent; scheduleSave(); }; } else { note.contentEditable=false; } }
+  const kpis=(data.performance&&data.performance.kpis)||[];
+  const empty=document.getElementById('perfEmpty'); if(empty) empty.style.display=kpis.length?'none':'';
+  const tb=document.getElementById('perfBody'); if(!tb) return; tb.innerHTML='';
+  kpis.forEach(r=>{
+    const tr=document.createElement('tr');
+    const nameTd=ed(r.name,v=>r.name=v); tr.appendChild(nameTd);
+    addDel(nameTd, ()=>{ data.performance.kpis.splice(data.performance.kpis.indexOf(r),1); renderPerformance(); });
+    tr.appendChild(ed(r.target,v=>r.target=v));
+    tr.appendChild(ed(r.actual,v=>r.actual=v));
+    const stTd=document.createElement('td');
+    const sel=document.createElement('select'); sel.className='status '+perfCls(r.status);
+    PERF_ST.forEach(([s])=>{const o=document.createElement('option');o.value=s;o.textContent=s;if(s===r.status)o.selected=true;sel.appendChild(o);});
+    sel.onchange=()=>{ r.status=sel.value; sel.className='status '+perfCls(r.status); scheduleSave(); };
+    stTd.appendChild(sel); tr.appendChild(stTd);
+    tr.appendChild(ed(r.notes,v=>r.notes=v));
+    tb.appendChild(tr);
+  });
+}
+function addPerfRow(){ data.performance.kpis.push({name:"",target:"",actual:"",status:"No data",notes:""}); renderPerformance(); scheduleSave(); }
+/* ---------- EOW passcode lock ---------- */
+function eowHash(s){ let h=0; for(let i=0;i<String(s).length;i++){ h=(Math.imul(h,31)+String(s).charCodeAt(i))|0; } return 'h'+(h>>>0).toString(36); }
+function applyEowLock(){
+  const pin=(data&&data.meta&&data.meta.eowPin)||'';
+  let tok=''; try{ tok=localStorage.getItem('daybreak-eow-unlock')||''; }catch(e){}
+  const unlocked = !!pin && tok===pin;
+  document.body.classList.toggle('eow-locked', !unlocked);
+}
+function toggleEowLock(){
+  if(!document.body.classList.contains('eow-locked')){
+    try{ localStorage.removeItem('daybreak-eow-unlock'); }catch(e){}
+    document.body.classList.add('eow-locked');
+    return;
+  }
+  const pin=(data&&data.meta&&data.meta.eowPin)||'';
+  if(!pin){
+    const np=prompt('Set a passcode for your private End-of-Week report.\n\nOnly you should know this — others on the shared login won’t see the EOW tab without it.');
+    if(np===null || !np.trim()) return;
+    data.meta.eowPin=eowHash(np.trim()); scheduleSave();
+    try{ localStorage.setItem('daybreak-eow-unlock', data.meta.eowPin); }catch(e){}
+    document.body.classList.remove('eow-locked'); goTo('eow');
+    return;
+  }
+  const en=prompt('Enter your End-of-Week report passcode:');
+  if(en===null) return;
+  if(eowHash(en.trim())===pin){
+    try{ localStorage.setItem('daybreak-eow-unlock', pin); }catch(e){}
+    document.body.classList.remove('eow-locked'); goTo('eow');
+  } else { alert('That passcode didn’t match.'); }
+}
+function renderOwnerRollup(){
+  const tb=document.getElementById('ownerRollupBody'); if(!tb) return; tb.innerHTML='';
+  const rows=ownerRollupData();
+  rows.forEach(m=>{
+    const pct=m.total?Math.round(m.done/m.total*100):0;
+    const tr=document.createElement('tr');
+    tr.innerHTML='<td style="font-weight:700">'+esc(m.owner)+'</td>'
+      +'<td class="num">'+m.done+'</td><td class="num">'+m.prog+'</td><td class="num">'+m.ns+'</td>'
+      +'<td class="num" style="color:'+(m.overdue?'var(--risk)':'inherit')+';font-weight:'+(m.overdue?'700':'400')+'">'+m.overdue+'</td>'
+      +'<td class="num">'+m.total+'</td>'
+      +'<td><div class="bararea" style="height:7px;background:var(--sky);border-radius:999px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--teal);border-radius:999px"></div></div><small class="note">'+pct+'%</small></td>';
+    tb.appendChild(tr);
+  });
+}
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+/* ---------- Discovery tracker (column-driven) ---------- */
+function renderTrackerHead(){
+  const head=document.getElementById('trackerHead'); if(!head) return; head.innerHTML='';
+  const num=document.createElement('th'); num.style.width='34px'; num.className='col-num'; num.textContent='#'; head.appendChild(num);
+  data.discColumns.forEach(col=>{
+    const th=document.createElement('th'); th.className='col-'+col.key; if(col.w) th.style.width=col.w+'px';
+    const wrap=document.createElement('span'); wrap.className='colhd';
+    const lab=document.createElement('span'); lab.textContent=col.label||col.key;
+    if(currentMode()==='internal'){ lab.contentEditable=true; lab.oninput=()=>{ col.label=lab.textContent.trim(); scheduleSave(); }; }
+    wrap.appendChild(lab);
+    if(currentMode()==='internal'){
+      const del=document.createElement('button'); del.className='delcol'; del.title='Delete this column'; del.textContent='✕';
+      del.onclick=()=>delTrackerCol(col.key); wrap.appendChild(del);
+    }
+    th.appendChild(wrap); head.appendChild(th);
+  });
+}
+function renderTracker(){
+  renderTrackerHead();
+  const tb=document.getElementById('trackerBody'); tb.innerHTML='';
+  data.tracker.forEach((r,i)=>{
+    const tr=document.createElement('tr');
+    const nm=document.createElement('td'); nm.className='rownum col-num'; nm.textContent=i+1; tr.appendChild(nm);
+    addDel(nm, ()=>{ data.tracker.splice(data.tracker.indexOf(r),1); renderTracker(); renderChips(); renderPath(); renderSummary(); });
+    data.discColumns.forEach(col=>{
+      const k=col.key;
+      if(col.status){
+        const st=document.createElement('td'); st.className='col-'+k;
+        const sel=document.createElement('select'); sel.className='status '+cls(r[k]);
+        STATUSES.forEach(([s])=>{const o=document.createElement('option');o.value=s;o.textContent=s;if(s===r[k])o.selected=true;sel.appendChild(o);});
+        sel.onchange=()=>{r[k]=sel.value;sel.className='status '+cls(r[k]);renderChips();renderPath();renderSummary();renderPhaseHeads();scheduleSave();};
+        st.appendChild(sel); tr.appendChild(st);
+      } else if(col.list){
+        const q=document.createElement('td'); q.className='col-'+k; q.contentEditable=true;
+        const ul=document.createElement('ul'); ul.className='q';
+        (Array.isArray(r[k])?r[k]:(r[k]?[r[k]]:[])).forEach(x=>{const li=document.createElement('li');li.textContent=x;ul.appendChild(li);});
+        q.appendChild(ul);
+        q.oninput=()=>{r[k]=Array.from(q.querySelectorAll('li')).map(li=>li.textContent).filter(Boolean); if(r[k].length===0)r[k]=[q.textContent]; scheduleSave();};
+        tr.appendChild(q);
+      } else {
+        const td=ed(typeof r[k]==='string'?r[k]:(r[k]||''), v=>r[k]=v); td.classList.add('col-'+k); tr.appendChild(td);
+      }
+    });
+    tb.appendChild(tr);
+  });
+  renderChips();
+  renderDiscCols();
+}
+function addTrackerCol(){
+  const label=prompt('New column name:'); if(!label) return;
+  let base=label.toLowerCase().replace(/[^a-z0-9]+/g,'') || 'col';
+  let key=base, n=1; const taken=data.discColumns.map(c=>c.key);
+  while(taken.includes(key)){ key=base+(++n); }
+  data.discColumns.push({key,label:label.trim(),w:150});
+  data.discCols[key]=true;
+  data.tracker.forEach(r=>{ if(!(key in r)) r[key]=''; });
+  renderTracker(); scheduleSave();
+}
+function delTrackerCol(key){
+  if(!confirm('Delete the "'+key+'" column and its data from every row?')) return;
+  data.discColumns=data.discColumns.filter(c=>c.key!==key);
+  delete data.discCols[key];
+  data.tracker.forEach(r=>{ delete r[key]; });
+  renderTracker(); scheduleSave();
+}
+/* ---------- Discovery: client columns + file-upload form ---------- */
+function applyDiscColStyle(){
+  let st=document.getElementById('discColStyle');
+  if(!st){ st=document.createElement('style'); st.id='discColStyle'; document.head.appendChild(st); }
+  const cols=data.discCols||{};
+  st.textContent=Object.keys(cols).filter(k=>!cols[k]).map(k=>'body.mode-client #trackerTbl .col-'+k+'{display:none!important;}').join('\n');
+}
+function renderDiscCols(){
+  applyDiscColStyle();
+  const box=document.getElementById('discColCtl'); if(!box) return; box.innerHTML='';
+  data.discColumns.forEach(col=>{
+    const k=col.key;
+    const lab=document.createElement('label');
+    const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=!!data.discCols[k];
+    cb.onchange=()=>{ data.discCols[k]=cb.checked; applyDiscColStyle(); scheduleSave(); };
+    lab.appendChild(cb); lab.appendChild(document.createTextNode(' '+(col.label||k)));
+    box.appendChild(lab);
+  });
+}
+function renderDiscForm(){
+  const inp=document.getElementById('discFormUrl'); const mount=document.getElementById('discFormMount');
+  if(!inp||!mount) return;
+  if(inp.value!==(data.discForm.url||'')) inp.value=data.discForm.url||'';
+  if(!inp.dataset.wired){ inp.dataset.wired='1';
+    inp.addEventListener('input',()=>{ data.discForm.url=inp.value.trim(); scheduleSave(); renderDiscForm(); });
+  }
+  mount.innerHTML='';
+  const url=(data.discForm.url||'').trim();
+  if(url){ const f=document.createElement('iframe'); f.src=url; f.loading='lazy'; f.title='File upload'; mount.appendChild(f); }
+  else { const p=document.createElement('p'); p.className='note internal-only'; p.textContent='No form linked yet — paste a Google Form embed link above to show an upload area to clients.'; mount.appendChild(p); }
+}
+function renderChips(){
+  const box=document.getElementById('statChips'); box.innerHTML='';
+  const total=data.tracker.length; const counts={}; STATUSES.forEach(([s])=>counts[s]=0);
+  data.tracker.forEach(r=>counts[r.status]=(counts[r.status]||0)+1);
+  const done=counts["Complete"]||0;
+  const c0=document.createElement('span');c0.className='chip';c0.innerHTML='<b>'+done+'/'+total+'</b> topics closed';box.appendChild(c0);
+  STATUSES.forEach(([s])=>{if(counts[s]){const c=document.createElement('span');c.className='chip';c.textContent=s+': '+counts[s];box.appendChild(c);}});
+}
+function addTrackerRow(){
+  const row={};
+  data.discColumns.forEach(col=>{ row[col.key]= col.list?[""] : col.status?"Open" : ""; });
+  data.tracker.push(row);
+  renderTracker();renderPath();renderSummary();scheduleSave();
+}
+
+/* ---------- Setup-style phase tables ---------- */
+function renderSetupTable(phase, body, foot, cards){
+  body.innerHTML='';
+  const rows=data.setup.filter(r=>r.phase===phase);
+  const recalc=()=>{ recalcSetupTable(phase, body, foot, cards); renderSummary(); renderPath(); };
+  rows.forEach(r=>{
+    const tr=document.createElement('tr');
+    const wsTd=ed(r.ws,v=>r.ws=v); tr.appendChild(wsTd);
+    addDel(wsTd, ()=>{ data.setup.splice(data.setup.indexOf(r),1); renderPhaseTables(); renderSummary(); renderPath(); });
+    tr.appendChild(roleCell(r,'pl',recalc));
+    tr.appendChild(roleCell(r,'tl',recalc));
+    tr.appendChild(roleCell(r,'qa',recalc));
+    tr.appendChild(roleCell(r,'tr',recalc));
+    const tot=document.createElement('td');tot.className='num internal-only';tot.style.fontWeight='700';tot.dataset.role='rowtot';tr.appendChild(tot);
+    tr.appendChild(ed(r.inc,v=>r.inc=v));
+    body.appendChild(tr);
+  });
+  recalcSetupTable(phase, body, foot, cards);
+}
+function recalcSetupTable(phase, body, foot, cards){
+  const rows=data.setup.filter(r=>r.phase===phase);
+  let pl=0,tl=0,qa=0,trh=0;
+  rows.forEach((r,i)=>{
+    const rt=(+r.pl||0)+(+r.tl||0)+(+r.qa||0)+(+r.tr||0);
+    if(body.children[i]) body.children[i].querySelector('[data-role=rowtot]').textContent=rt;
+    pl+=+r.pl||0;tl+=+r.tl||0;qa+=+r.qa||0;trh+=+r.tr||0;
+  });
+  const grand=pl+tl+qa+trh;
+  if(foot){ foot.innerHTML='';
+    const f=document.createElement('tr'); f.className='internal-only'; f.style.background='var(--sky)'; f.style.fontWeight='700';
+    f.innerHTML='<td style="font-family:var(--sansHead);color:var(--green)">Phase total (hrs)</td>'
+      +'<td class="num">'+pl+'</td><td class="num">'+tl+'</td><td class="num">'+qa+'</td><td class="num">'+trh+'</td>'
+      +'<td class="num" style="color:var(--green)">'+grand+'</td><td></td>';
+    foot.appendChild(f);
+  }
+  if(cards){ cards.innerHTML='';
+    [["SOM",pl],["Team Lead",tl],["QA",qa],["Trainer",trh],["Phase total",grand]].forEach(([k,v],i)=>{
+      const d=document.createElement('div'); d.className='card'+(i===4?' feature':''); d.innerHTML='<div class="k">'+k+'</div><div class="v">'+v+' h</div>'; cards.appendChild(d);
+    });
+    const wc=360;
+    document.getElementById('sharedRead').textContent=
+      'Trainer is the heaviest setup load ('+trh+' h, ~'+Math.round(trh/wc*100)+'% of one person over 9 weeks) — front-loaded in T3, then it frees up. Team Lead ('+tl+' h, ~'+Math.round(tl/wc*100)+'%) and QA ('+qa+' h, ~'+Math.round(qa/wc*100)+'%) sit well under full-time, so sharing all three across another program is realistic — provided the other program is not ramping in weeks 5–8, which is the crunch.';
+  }
+}
+function addSetupRow(phase){ data.setup.push({phase,ws:"",pl:0,tl:0,qa:0,tr:0,inc:""}); renderPhaseTables(); renderSummary(); renderPath(); scheduleSave(); }
+
+/* ---------- Generic flexible table engine (add/del row+col, edit, client-column ticks) ---------- */
+function flexColStyle(cfg){
+  let st=document.getElementById(cfg.id+'-colstyle');
+  if(!st){ st=document.createElement('style'); st.id=cfg.id+'-colstyle'; document.head.appendChild(st); }
+  const vis=cfg.vis()||{};
+  st.textContent=Object.keys(vis).filter(k=>!vis[k]).map(k=>'body.mode-client #'+cfg.id+' .fcol-'+k+'{display:none!important;}').join('\n');
+}
+function renderFlex(cfg){
+  const cols=cfg.cols(), rows=cfg.rows(), vis=cfg.vis();
+  const tbl=document.getElementById(cfg.id); if(!tbl) return;
+  const head=tbl.querySelector('thead tr'); head.innerHTML='';
+  const num=document.createElement('th'); num.style.width='34px'; num.textContent='#'; head.appendChild(num);
+  cols.forEach(col=>{
+    const th=document.createElement('th'); th.className='fcol-'+col.key; if(col.w) th.style.width=col.w+'px';
+    const wrap=document.createElement('span'); wrap.className='colhd';
+    const lab=document.createElement('span'); lab.textContent=col.label||col.key;
+    if(currentMode()==='internal'){ lab.contentEditable=true; lab.oninput=()=>{ col.label=lab.textContent.trim(); scheduleSave(); }; }
+    wrap.appendChild(lab);
+    if(currentMode()==='internal'){
+      const del=document.createElement('button'); del.className='delcol'; del.title='Delete this column'; del.textContent='✕';
+      del.onclick=()=>{
+        if(cols.length<=1){ alert('Keep at least one column.'); return; }
+        if(!confirm('Delete the "'+(col.label||col.key)+'" column and its data from every row?')) return;
+        cols.splice(cols.indexOf(col),1); delete vis[col.key]; rows.forEach(r=>delete r[col.key]);
+        renderFlex(cfg); scheduleSave();
+      };
+      wrap.appendChild(del);
+    }
+    th.appendChild(wrap); head.appendChild(th);
+  });
+  const tb=tbl.querySelector('tbody'); tb.innerHTML='';
+  rows.forEach((r,i)=>{
+    const tr=document.createElement('tr');
+    const nm=document.createElement('td'); nm.className='rownum'; nm.textContent=i+1; tr.appendChild(nm);
+    addDel(nm, ()=>{ rows.splice(rows.indexOf(r),1); renderFlex(cfg); });
+    cols.forEach(col=>{ const td=ed(r[col.key]!=null?r[col.key]:'', v=>r[col.key]=v); td.classList.add('fcol-'+col.key); tr.appendChild(td); });
+    tb.appendChild(tr);
+  });
+  flexColStyle(cfg);
+  renderFlexCtl(cfg);
+}
+function renderFlexCtl(cfg){
+  const box=document.getElementById(cfg.ctlId); if(!box) return; box.innerHTML='';
+  cfg.cols().forEach(col=>{
+    const lab=document.createElement('label');
+    const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=!!cfg.vis()[col.key];
+    cb.onchange=()=>{ cfg.vis()[col.key]=cb.checked; flexColStyle(cfg); scheduleSave(); };
+    lab.appendChild(cb); lab.appendChild(document.createTextNode(' '+(col.label||col.key)));
+    box.appendChild(lab);
+  });
+}
+function addFlexRow(cfg){ const row={}; cfg.cols().forEach(c=>row[c.key]=''); cfg.rows().push(row); renderFlex(cfg); scheduleSave(); }
+function addFlexCol(cfg){
+  const label=prompt('New column name:'); if(!label) return;
+  const cols=cfg.cols(); let base=label.toLowerCase().replace(/[^a-z0-9]+/g,'')||'col'; let key=base, n=1;
+  const taken=cols.map(c=>c.key); while(taken.includes(key)) key=base+(++n);
+  cols.push({key,label:label.trim(),w:160}); cfg.vis()[key]=true; cfg.rows().forEach(r=>{ if(!(key in r)) r[key]=''; });
+  renderFlex(cfg); scheduleSave();
+}
+const CFG_CADENCE ={id:'cadenceTbl',ctlId:'cadenceCtl', cols:()=>data.cadenceColumns, rows:()=>data.cadence,           vis:()=>data.cadenceCols};
+const CFG_BAU     ={id:'bauTbl',    ctlId:'bauCtl',     cols:()=>data.bauColumns,     rows:()=>data.bau,               vis:()=>data.bauCols};
+const CFG_DECISION={id:'gngDecTbl', ctlId:'decisionCtl',cols:()=>data.decisionColumns,rows:()=>data.goNoGo.decisions,  vis:()=>data.decisionCols};
+function renderCadence(){ renderFlex(CFG_CADENCE); }
+function renderBau(){ renderFlex(CFG_BAU); }
+function renderDecision(){ renderFlex(CFG_DECISION); }
+function addBauRow(){ addFlexRow(CFG_BAU); }
+
+/* ---------- Meeting recap -> action tracker ---------- */
+const ACT_TYPES=['IDS','To-Do','BAU'];
+const ACT_ST=[["Open","st-open"],["In progress","st-prog"],["Done","st-done"],["Blocked","st-block"]];
+function actCls(s){const m=ACT_ST.find(x=>x[0]===s);return m?m[1]:'st-open';}
+function renderActionChips(){
+  const box=document.getElementById('actionChips'); if(!box) return; box.innerHTML='';
+  const rows=data.actionTracker||[];
+  const esc=rows.filter(r=>r.escalate).length, open=rows.filter(r=>r.status!=='Done').length;
+  const chips=[['Total',rows.length],['IDS',rows.filter(r=>r.type==='IDS').length],['To-Do',rows.filter(r=>r.type==='To-Do').length],['BAU',rows.filter(r=>r.type==='BAU').length],['Escalated',esc],['Open',open]];
+  chips.forEach(([k,v])=>{ const c=document.createElement('span'); c.className='chip'; c.innerHTML='<b>'+v+'</b> '+k; box.appendChild(c); });
+}
+function renderActions(){
+  const tb=document.getElementById('actionBody'); if(!tb) return; tb.innerHTML='';
+  data.actionTracker.forEach((r,i)=>{
+    const tr=document.createElement('tr');
+    const nm=document.createElement('td'); nm.className='rownum'; nm.textContent=i+1; tr.appendChild(nm);
+    addDel(nm, ()=>{ data.actionTracker.splice(data.actionTracker.indexOf(r),1); renderActions(); });
+    tr.appendChild(ed(r.item,v=>r.item=v));
+    tr.appendChild(ed(r.owner,v=>r.owner=v));
+    const tyTd=document.createElement('td');
+    const tsel=document.createElement('select'); tsel.className='pstat';
+    ACT_TYPES.forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;if(t===r.type)o.selected=true;tsel.appendChild(o);});
+    tsel.onchange=()=>{ r.type=tsel.value; renderActionChips(); scheduleSave(); };
+    tyTd.appendChild(tsel); tr.appendChild(tyTd);
+    const stTd=document.createElement('td');
+    const ssel=document.createElement('select'); ssel.className='status '+actCls(r.status);
+    ACT_ST.forEach(([s])=>{const o=document.createElement('option');o.value=s;o.textContent=s;if(s===r.status)o.selected=true;ssel.appendChild(o);});
+    ssel.onchange=()=>{ r.status=ssel.value; ssel.className='status '+actCls(r.status); renderActionChips(); scheduleSave(); };
+    stTd.appendChild(ssel); tr.appendChild(stTd);
+    const esTd=document.createElement('td'); esTd.style.textAlign='center';
+    const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=!!r.escalate;
+    cb.onchange=()=>{ r.escalate=cb.checked; renderActionChips(); scheduleSave(); };
+    esTd.appendChild(cb); tr.appendChild(esTd);
+    tr.appendChild(ed(r.notes,v=>r.notes=v));
+    tb.appendChild(tr);
+  });
+  renderActionChips();
+}
+function addActionRow(){ data.actionTracker.push({item:"",owner:"",type:"BAU",status:"Open",escalate:false,notes:""}); renderActions(); scheduleSave(); }
+function findActions(lines){
+  const verbs=/\b(will|to|need to|needs to|should|must|shall|follow[- ]?up|send|prepare|create|update|review|confirm|schedule|share|draft|build|set up|assign|check|finalis?e|complete|coordinate|reach out|call|email|define|document|deliver|provide|ensure|fix|escalate|decide|align|approve|validate|submit|track|monitor|test|deploy|onboard|hire|train)\b/i;
+  const marker=/^(\s*[-*•]\s+|\[\s?\]\s*|action\s*[:\-]|todo\s*[:\-]?|to-?do\s*[:\-]?|follow[- ]?up\s*[:\-]?|next steps?\s*[:\-]?|ai\s*[:\-])/i;
+  const found=[];
+  lines.forEach(line=>{
+    const hadMarker=marker.test(line);
+    let text=line.replace(marker,'').trim();
+    let owner='';
+    const m=text.match(/^([A-Z][A-Za-z]+(?:\s*[&\/]\s*[A-Z][A-Za-z]+)?)\s*[:\-–]\s+(.*)/);
+    const isCat = m && /^(risk|issue|problem|blocker|decision|decide|action|note|todo|to-do)s?$/i.test(m[1].trim());
+    if(m && verbs.test(m[2]) && !isCat){ owner=m[1].trim(); text=m[2].trim(); }
+    else if(isCat){ text=m[2].trim(); } // strip the category label, keep the item text
+    const atm=text.match(/@([A-Za-z]+)/); if(atm && !owner){ owner=atm[1]; text=text.replace(/@[A-Za-z]+/,'').trim(); }
+    // detect type/escalate on the ORIGINAL line so category keywords aren't lost to owner stripping
+    let type = /\b(issue|issues|problem|problems|risk|risks|blocker|blocked|decide|decision|discuss|IDS)\b/i.test(line) ? 'IDS' : 'BAU';
+    const escalate = /\b(escalat\w*|urgent|asap|critical|blocker|blocked|overdue|highest priority)\b/i.test(line);
+    if(!hadMarker && !verbs.test(text) && type!=='IDS') return;
+    if(!text) return;
+    found.push({item:text, owner, type, status:'Open', escalate, notes:''});
+  });
+  return found;
+}
+function findMilestones(lines){
+  const mrx=/\b(milestone|go[- ]?live|launch(?:es|ed|ing)?|kick[- ]?off|sign[- ]?off|deadline|target date|deliverable|phase\s*\d)\b/i;
+  const out=[], srcLines=new Set();
+  lines.forEach(line=>{
+    if(!mrx.test(line)) return;
+    srcLines.add(line);
+    let text=line.replace(/^(\s*[-*•]\s+)/,'').replace(/^(milestone|target|deliverable|next step)s?\s*[:\-–]\s*/i,'').trim();
+    const wm=text.match(/week\s*(\d+)/i);
+    const wk=wm?Math.min(Math.max(1,+wm[1]),WEEKS):1;
+    out.push({row:{stage:'milestone', phase:'★ '+text, s:wk, e:wk, color:'#7c3aed', milestone:true}, line});
+  });
+  return {milestones:out.map(o=>o.row), srcLines};
+}
+function parseVtt(txt){
+  return txt.split(/\r?\n/)
+    .filter(l=>!/^WEBVTT/i.test(l) && !/-->/.test(l) && !/^\d+$/.test(l.trim()) && l.trim()!=='' && !/^(NOTE|STYLE|REGION)\b/i.test(l))
+    .map(l=>l.replace(/<[^>]+>/g,'').trim())
+    .filter(Boolean).join('\n');
+}
+function handleRecapFile(file){
+  const msg=document.getElementById('extractMsg'); const ta=document.getElementById('recapNotes');
+  const name=(file.name||'').toLowerCase();
+  const setTitle=()=>{ const t=document.getElementById('recapTitle'); if(t && !t.value) t.value=file.name.replace(/\.[^.]+$/,''); };
+  if(name.endsWith('.docx')){
+    if(!window.mammoth){ if(msg) msg.textContent='.docx reader still loading — try again in a moment, or paste the text.'; return; }
+    const rd=new FileReader();
+    rd.onload=()=>{ window.mammoth.extractRawText({arrayBuffer:rd.result})
+      .then(r=>{ if(ta) ta.value=r.value; setTitle(); if(msg) msg.textContent='Loaded '+file.name+' — click “Find actions & milestones”.'; })
+      .catch(()=>{ if(msg) msg.textContent='Could not read that .docx file.'; }); };
+    rd.readAsArrayBuffer(file);
+  } else {
+    const rd=new FileReader();
+    rd.onload=()=>{ let txt=rd.result||''; if(name.endsWith('.vtt')) txt=parseVtt(txt); if(ta) ta.value=txt; setTitle(); if(msg) msg.textContent='Loaded '+file.name+' — click “Extract & save recap”.'; };
+    rd.readAsText(file);
+  }
+}
+let candidateData=null;
+function previewRecap(){
+  const ta=document.getElementById('recapNotes'); const msg=document.getElementById('extractMsg');
+  const raw=(ta&&ta.value)||'';
+  if(!raw.trim()){ if(msg) msg.textContent='Paste a transcript or upload a file first.'; return; }
+  const allLines=raw.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+  const {milestones, srcLines}=findMilestones(allLines);
+  const actions=findActions(allLines.filter(l=>!srcLines.has(l)));
+  candidateData={
+    date:(document.getElementById('recapDate')||{}).value || new Date().toISOString().slice(0,10),
+    title:((document.getElementById('recapTitle')||{}).value||'').trim(),
+    by:((document.getElementById('recapBy')||{}).value||'').trim(),
+    actions:actions.map(a=>Object.assign({},a,{_added:false})),
+    milestones:milestones.map(m=>Object.assign({},m,{_added:false, week:m.s})),
+    addedA:0, addedM:0
+  };
+  if(msg) msg.textContent='Found '+actions.length+' possible action'+(actions.length===1?'':'s')+' and '+milestones.length+' milestone'+(milestones.length===1?'':'s')+'. Review below and add the ones that matter.';
+  renderCandidates();
+}
+function renderCandidates(){
+  const box=document.getElementById('recapCandidates'); if(!box) return; box.innerHTML='';
+  if(!candidateData){ return; }
+  const c=candidateData;
+  if(!c.actions.length && !c.milestones.length){
+    box.innerHTML='<p class="note">No clear action items or milestones were detected. You can still save the meeting to history below, or add rows manually.</p>';
+  }
+  if(c.actions.length){
+    const h=document.createElement('div'); h.className='candgrp'; h.textContent='Possible action items'; box.appendChild(h);
+    c.actions.forEach(a=>{
+      const row=document.createElement('div'); row.className='cand'+(a._added?' added':'');
+      const item=document.createElement('input'); item.type='text'; item.className='c-item'; item.value=a.item; item.oninput=()=>a.item=item.value;
+      const owner=document.createElement('input'); owner.type='text'; owner.className='c-owner'; owner.placeholder='Owner'; owner.value=a.owner||''; owner.oninput=()=>a.owner=owner.value;
+      const tsel=document.createElement('select');
+      ACT_TYPES.forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;if(t===a.type)o.selected=true;tsel.appendChild(o);});
+      tsel.onchange=()=>a.type=tsel.value;
+      const esc=document.createElement('label'); esc.className='esc';
+      const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=!!a.escalate; cb.onchange=()=>a.escalate=cb.checked;
+      esc.appendChild(cb); esc.appendChild(document.createTextNode('esc'));
+      const btn=document.createElement('button'); btn.className='btn btn--ghost';
+      const paint=()=>{ btn.textContent=a._added?'✓ Added':'Add'; btn.disabled=a._added; row.className='cand'+(a._added?' added':''); };
+      btn.onclick=()=>{ if(a._added) return; data.actionTracker.push({item:a.item,owner:a.owner,type:a.type,status:'Open',escalate:!!a.escalate,notes:''}); a._added=true; c.addedA++; paint(); renderActions(); scheduleSave(); };
+      row.append(item,owner,tsel,esc,btn); box.appendChild(row); paint();
+    });
+  }
+  if(c.milestones.length){
+    const h=document.createElement('div'); h.className='candgrp'; h.textContent='Possible strategic milestones (→ Gantt)'; box.appendChild(h);
+    c.milestones.forEach(m=>{
+      const row=document.createElement('div'); row.className='cand'+(m._added?' added':'');
+      const item=document.createElement('input'); item.type='text'; item.className='c-item'; item.value=m.phase.replace(/^★\s*/,''); item.oninput=()=>item.value;
+      const wk=document.createElement('input'); wk.type='number'; wk.min=1; wk.max=WEEKS; wk.className='c-week'; wk.value=m.week||1; wk.onchange=()=>m.week=Math.min(Math.max(1,+wk.value),WEEKS);
+      const lab=document.createElement('span'); lab.className='note'; lab.textContent='Week';
+      const btn=document.createElement('button'); btn.className='btn btn--ghost';
+      const paint=()=>{ btn.textContent=m._added?'✓ Added':'Add to Gantt'; btn.disabled=m._added; row.className='cand'+(m._added?' added':''); };
+      btn.onclick=()=>{ if(m._added) return; const w=Math.min(Math.max(1,+wk.value||1),WEEKS); data.gantt.push({stage:'milestone',phase:'★ '+item.value,s:w,e:w,color:'#7c3aed',milestone:true}); m._added=true; c.addedM++; paint(); renderGantt(); renderSummary(); scheduleSave(); };
+      row.append(item,lab,wk,btn); box.appendChild(row); paint();
+    });
+  }
+  const foot=document.createElement('div'); foot.className='candsave';
+  const save=document.createElement('button'); save.className='btn btn--solid'; save.textContent='Save recap to history';
+  save.onclick=saveRecapHistory;
+  const hint=document.createElement('span'); hint.className='note'; hint.textContent='Logs this meeting (date, title, uploader) with the count you added.';
+  foot.append(save,hint); box.appendChild(foot);
+}
+function saveRecapHistory(){
+  if(!candidateData) return;
+  const c=candidateData;
+  data.recaps.unshift({ date:c.date, title:c.title, by:c.by, actions:c.addedA, milestones:c.addedM, ts:Date.now() });
+  const msg=document.getElementById('extractMsg');
+  if(msg) msg.textContent='Recap saved to history · '+c.addedA+' action'+(c.addedA===1?'':'s')+' and '+c.addedM+' milestone'+(c.addedM===1?'':'s')+' added.';
+  candidateData=null;
+  const ta=document.getElementById('recapNotes'); if(ta) ta.value='';
+  const tt=document.getElementById('recapTitle'); if(tt) tt.value='';
+  document.getElementById('recapCandidates').innerHTML='';
+  renderRecaps(); scheduleSave();
+}
+function renderRecaps(){
+  const box=document.getElementById('recapList'); if(!box) return;
+  const list=data.recaps||[];
+  if(!list.length){ box.innerHTML='<p class="note">No recaps saved yet.</p>'; return; }
+  box.innerHTML='';
+  list.forEach(r=>{
+    const card=document.createElement('div'); card.className='recapcard';
+    const main=document.createElement('div'); main.className='rc-main';
+    const t=document.createElement('div'); t.className='rc-title'; t.textContent=r.title || ('Recap — '+(r.date||''));
+    const meta=document.createElement('div'); meta.className='rc-meta';
+    const bits=[]; if(r.date) bits.push(r.date); if(r.by) bits.push('by '+r.by);
+    bits.push((r.actions||0)+' action'+((r.actions||0)===1?'':'s'));
+    bits.push((r.milestones||0)+' milestone'+((r.milestones||0)===1?'':'s'));
+    meta.textContent=bits.join(' · ');
+    main.appendChild(t); main.appendChild(meta);
+    const del=document.createElement('button'); del.className='rc-del internal-only'; del.textContent='✕'; del.title='Remove from history';
+    del.onclick=()=>{ data.recaps.splice(data.recaps.indexOf(r),1); renderRecaps(); scheduleSave(); };
+    card.appendChild(main); card.appendChild(del);
+    box.appendChild(card);
+  });
+}
+
+/* ---------- End-of-Week report ---------- */
+function eowList(arr, f){ return arr.length ? arr.map(f).join('\n') : '  — none'; }
+function buildEowReport(){
+  const title=(data.meta&&(data.meta.programName||data.meta.program))||'Daybreak Program';
+  const today=new Date();
+  const dateStr=today.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const acts=data.actionTracker||[];
+  const open=acts.filter(a=>a.status!=='Done');
+  const done=acts.filter(a=>a.status==='Done');
+  const esc=acts.filter(a=>a.escalate && a.status!=='Done');
+  const ids=acts.filter(a=>a.type==='IDS' && a.status!=='Done');
+  const todos=acts.filter(a=>a.type==='To-Do' && a.status!=='Done');
+  const miles=(data.gantt||[]).filter(g=>g.milestone).slice().sort((a,b)=>a.s-b.s);
+  const phases=[['discovery','Discovery'],['setup','Set Up'],['deployment','Deployment'],['golive','Go Live / Hypercare']];
+  const L=[];
+  L.push(title+' — End-of-Week Report');
+  L.push(dateStr);
+  L.push('');
+  L.push('SUMMARY');
+  L.push('  Open actions: '+open.length+'   ·   Completed: '+done.length+'   ·   Escalated: '+esc.length);
+  L.push('  IDS (issues/decisions): '+ids.length+'   ·   To-Dos: '+todos.length);
+  L.push('');
+  L.push('PHASE STATUS');
+  phases.forEach(([id,label])=>L.push('  '+label+': '+phaseStatus(id)+' ('+phasePct(id)+'%)'));
+  L.push('');
+  if(esc.length){ L.push('⚠ ESCALATED — NEEDS ATTENTION'); esc.forEach(a=>L.push('  • '+a.item+(a.owner?(' ['+a.owner+']'):''))); L.push(''); }
+  L.push('OPEN ACTION ITEMS');
+  L.push(eowList(open, a=>'  • ['+a.type+'] '+a.item+(a.owner?(' — '+a.owner):'')+' ('+a.status+')'));
+  L.push('');
+  L.push('UPCOMING MILESTONES');
+  L.push(eowList(miles, g=>'  • '+g.phase.replace(/^★\s*/,'')+' — Week '+g.s));
+  L.push('');
+  L.push('COMPLETED THIS PERIOD');
+  L.push(eowList(done, a=>'  ✓ '+a.item+(a.owner?(' — '+a.owner):'')));
+  return L.join('\n');
+}
+function renderEow(){ const el=document.getElementById('eowReport'); if(el) el.textContent=buildEowReport(); const m=document.getElementById('eowMsg'); if(m) m.textContent='Generated '+new Date().toLocaleString(); }
+function copyEow(){
+  const el=document.getElementById('eowReport'); if(!el) return;
+  const t=el.textContent||'';
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(()=>{const m=document.getElementById('eowMsg'); if(m) m.textContent='Copied to clipboard.';}); }
+  else { const r=document.createRange(); r.selectNode(el); const s=window.getSelection(); s.removeAllRanges(); s.addRange(r); try{document.execCommand('copy');}catch(e){} s.removeAllRanges(); const m=document.getElementById('eowMsg'); if(m) m.textContent='Copied.'; }
+}
+
+/* ---------- Process Maturity Framework ---------- */
+function maturityLevel(p){
+  const stages=data.maturity.stages;
+  let lvl=0;
+  for(let i=0;i<stages.length;i++){
+    const arr=p.checks[stages[i].key]||[];
+    const all=arr.length>0 && arr.every(Boolean);
+    if(all) lvl=i+1; else break;
+  }
+  return lvl;
+}
+function renderMaturityModel(){
+  const tb=document.getElementById('maturityModelBody'); if(!tb) return; tb.innerHTML='';
+  data.maturity.stages.forEach((s,si)=>{
+    const tr=document.createElement('tr');
+    const nameTd=document.createElement('td');
+    const nm=document.createElement('div'); nm.className='matstage'; nm.textContent=s.name;
+    if(currentMode()==='internal'){ nm.contentEditable=true; nm.oninput=()=>{ s.name=nm.textContent.trim(); scheduleSave(); }; }
+    nameTd.appendChild(nm); tr.appendChild(nameTd);
+    tr.appendChild(ed(s.def, v=>{ s.def=v; }));
+    const critTd=document.createElement('td');
+    const ul=document.createElement('ul'); ul.className='q';
+    s.crit.forEach((c,ci)=>{
+      const li=document.createElement('li');
+      const sp=document.createElement('span'); sp.textContent=c;
+      if(currentMode()==='internal'){ sp.contentEditable=true; sp.oninput=()=>{ s.crit[ci]=sp.textContent.trim(); scheduleSave(); }; }
+      li.appendChild(sp); ul.appendChild(li);
+    });
+    critTd.appendChild(ul); tr.appendChild(critTd);
+    tb.appendChild(tr);
+  });
+}
+function maturityTarget(){ return (data.maturity && +data.maturity.target) || 3; }
+function fnPct(fn){ const t=maturityTarget(); return Math.round(Math.min(maturityLevel(fn),t)/t*100); }
+function frameworkPct(fw){ const fns=(fw.functions||[]); if(!fns.length) return 0; return Math.round(fns.reduce((a,f)=>a+fnPct(f),0)/fns.length); }
+function overallMaturityPct(){ const all=[]; (data.maturity.frameworks||[]).forEach(fw=>(fw.functions||[]).forEach(f=>all.push(fnPct(f)))); if(!all.length) return 0; return Math.round(all.reduce((a,b)=>a+b,0)/all.length); }
+function renderMaturity(){
+  renderMaturityModel();
+  const stages=data.maturity.stages;
+  const head=document.getElementById('maturityHead'); if(!head) return; head.innerHTML='';
+  ['#','Function','Primary deliverables','Governance process','SOP','Owner','Maturity'].forEach((h,i)=>{
+    const th=document.createElement('th'); th.textContent=h;
+    if(i===0)th.style.width='30px'; if(i===1)th.style.minWidth='170px'; if(i===2)th.style.minWidth='170px'; if(i===3)th.style.minWidth='180px'; if(i===4)th.style.width='150px'; if(i===5)th.style.width='90px'; if(i===6)th.style.width='150px';
+    head.appendChild(th);
+  });
+  stages.forEach(s=>{ const th=document.createElement('th'); th.style.minWidth='190px'; th.textContent=s.name+(s.optional?' (optional)':''); head.appendChild(th); });
+  const noteTh=document.createElement('th'); noteTh.style.width='150px'; noteTh.className='internal-only'; noteTh.textContent='Notes'; head.appendChild(noteTh);
+  const totalCols=7+stages.length+1;
+  const tb=document.getElementById('maturityBody'); tb.innerHTML='';
+  let idx=0;
+  (data.maturity.frameworks||[]).forEach(fw=>{
+    // framework group header
+    const gtr=document.createElement('tr'); gtr.className='fwrow';
+    const gtd=document.createElement('td'); gtd.colSpan=totalCols;
+    const nm=document.createElement('span'); nm.textContent=fw.name;
+    if(currentMode()==='internal'){ nm.contentEditable=true; nm.oninput=()=>{ fw.name=nm.textContent.trim(); scheduleSave(); }; }
+    gtd.appendChild(nm);
+    const pct=document.createElement('span'); pct.className='fwpct'; pct.textContent=frameworkPct(fw)+'% mature'; gtd.appendChild(pct);
+    if(currentMode()==='internal'){
+      const add=document.createElement('button'); add.className='btn btn--ghost'; add.style.cssText='float:right;margin-right:8px;padding:2px 10px;font-size:12px;'; add.textContent='+ function'; add.onclick=()=>addFunction(fw); gtd.appendChild(add);
+      const del=document.createElement('button'); del.className='btn btn--ghost'; del.style.cssText='float:right;margin-right:8px;padding:2px 10px;font-size:12px;'; del.textContent='✕ framework'; del.onclick=()=>{ if(confirm('Remove '+(fw.name||'this framework')+' and all its functions?')){ data.maturity.frameworks.splice(data.maturity.frameworks.indexOf(fw),1); renderMaturity(); scheduleSave(); } }; gtd.appendChild(del);
+    }
+    gtr.appendChild(gtd); tb.appendChild(gtr);
+    (fw.functions||[]).forEach(fn=>{
+      idx++;
+      const tr=document.createElement('tr');
+      const num=document.createElement('td'); num.className='rownum'; num.textContent=idx; tr.appendChild(num);
+      addDel(num, ()=>{ fw.functions.splice(fw.functions.indexOf(fn),1); renderMaturity(); });
+      tr.appendChild(ed(fn.name,v=>fn.name=v));
+      const dv=ed(fn.deliverables,v=>fn.deliverables=v); dv.className='deliv'; tr.appendChild(dv);
+      const gp=ed(fn.process,v=>fn.process=v); gp.className='govproc'; tr.appendChild(gp);
+      // SOP link (embed for visibility)
+      const sopTd=document.createElement('td'); sopTd.className='sopcell';
+      const si=document.createElement('input'); si.className='urlbox'; si.type='url'; si.value=fn.sop||''; si.placeholder='SOP link…';
+      si.oninput=()=>{ fn.sop=si.value.trim(); scheduleSave(); };
+      sopTd.appendChild(si);
+      if((fn.sop||'').trim()){ const a=document.createElement('a'); a.href=fn.sop; a.target='_blank'; a.rel='noopener'; a.textContent=' open ↗'; sopTd.appendChild(a); }
+      tr.appendChild(sopTd);
+      tr.appendChild(ed(fn.owner,v=>fn.owner=v));
+      // maturity badge + %
+      const lvl=maturityLevel(fn);
+      const lvlTd=document.createElement('td');
+      const badge=document.createElement('span'); badge.className='lvl lvl'+lvl;
+      badge.textContent= lvl===0?'Not documented':(stages[lvl-1].short||('Level '+lvl));
+      lvlTd.appendChild(badge);
+      const pc=document.createElement('span'); pc.className='lvloptim'; pc.textContent=' '+fnPct(fn)+'%'; lvlTd.appendChild(pc);
+      if(lvl>=4){ const star=document.createElement('span'); star.className='lvloptim'; star.textContent=' ★ Optimized'; lvlTd.appendChild(star); }
+      tr.appendChild(lvlTd);
+      stages.forEach(s=>{
+        const td=document.createElement('td');
+        const arr=fn.checks[s.key]||[];
+        const ul=document.createElement('ul'); ul.className='critlist';
+        s.crit.forEach((c,ci)=>{
+          const li=document.createElement('li');
+          const cbx=document.createElement('input'); cbx.type='checkbox'; cbx.checked=!!arr[ci];
+          cbx.onchange=()=>{ arr[ci]=cbx.checked; fn.checks[s.key]=arr; renderMaturity(); scheduleSave(); };
+          const sp=document.createElement('span'); sp.textContent=c;
+          if(currentMode()==='internal'){ sp.contentEditable=true; sp.oninput=()=>{ s.crit[ci]=sp.textContent.trim(); }; }
+          li.appendChild(cbx); li.appendChild(sp); ul.appendChild(li);
+        });
+        const done=arr.filter(Boolean).length;
+        const prog=document.createElement('div'); prog.className='subprog'; prog.textContent=done+'/'+s.crit.length+(done===s.crit.length&&s.crit.length?' · met':'');
+        td.appendChild(ul); td.appendChild(prog); tr.appendChild(td);
+      });
+      const note=ed(fn.notes,v=>fn.notes=v); note.className='internal-only'; tr.appendChild(note);
+      tb.appendChild(tr);
+    });
+  });
+  // summary cards: overall + per framework
+  const sum=document.getElementById('maturitySummary'); if(sum){ sum.innerHTML='';
+    const cards=[['Overall maturity',overallMaturityPct()+'%',true]];
+    (data.maturity.frameworks||[]).forEach(fw=>cards.push([fw.name.replace(/ Framework$/,''),frameworkPct(fw)+'%',false]));
+    cards.forEach(([k,v,feat])=>{ const d=document.createElement('div'); d.className='card'+(feat?' feature':''); d.innerHTML='<div class="k">'+k+'</div><div class="v">'+v+'</div>'; sum.appendChild(d); });
+  }
+}
+function addFunction(fw){ const checks={}; data.maturity.stages.forEach(s=>checks[s.key]=new Array(s.crit.length).fill(false)); fw.functions.push({name:"",deliverables:"",process:"",owner:"",sop:"",checks,notes:""}); renderMaturity(); scheduleSave(); }
+function addFramework(){ data.maturity.frameworks.push({name:"New framework",functions:[]}); renderMaturity(); scheduleSave(); }
+
+function renderPhaseTables(){
+  renderSetupTable('setup', document.getElementById('setupBody'), document.getElementById('setupFoot'), document.getElementById('setupCards'));
+  renderSetupTable('deployment', document.getElementById('deployBody'), document.getElementById('deployFoot'), null);
+  renderSetupTable('golive', document.getElementById('goliveBody'), document.getElementById('goliveFoot'), null);
+}
+
+/* ---------- Deployment tracker ---------- */
+const DT_ST=[["Not started","st-open"],["In progress","st-prog"],["Done","st-done"]];
+function dtCls(s){ return s==='Done'?'st-done':s==='In progress'?'st-prog':'st-open'; }
+// a line item is complete only if status is Done AND every sub-item is checked
+function dtRowComplete(r){
+  if(r.status!=='Done') return false;
+  const subs=Array.isArray(r.sub)?r.sub:[];
+  return subs.every(s=>s && s.done);
+}
+function dtCounts(rows){
+  let done=0,prog=0,ns=0;
+  rows.forEach(r=>{ if(dtRowComplete(r))done++; else if(r.status==='In progress'||r.status==='Done')prog++; else ns++; });
+  return {total:rows.length,done,prog,ns,pct:rows.length?Math.round(done/rows.length*100):0};
+}
+function parseTarget(r){
+  if(r.date){ const d=new Date(r.date); if(!isNaN(d)) return d; }
+  if(r.target){ const m=String(r.target).match(/^(\d{1,2})\/(\d{1,2})$/); if(m){ const yr=new Date().getFullYear(); return new Date(yr,+m[1]-1,+m[2]); } }
+  return null;
+}
+function ownerRollupData(){
+  const map={}; const today=new Date(); today.setHours(0,0,0,0);
+  (data.deployTracker||[]).forEach(r=>{
+    const o=((r.owner||'').trim())||'—';
+    if(!map[o]) map[o]={owner:o,done:0,prog:0,ns:0,overdue:0,total:0};
+    const m=map[o]; m.total++;
+    const complete=dtRowComplete(r);
+    if(complete) m.done++; else if(r.status==='In progress'||r.status==='Done') m.prog++; else m.ns++;
+    if(!complete){ const d=parseTarget(r); if(d && d<today) m.overdue++; }
+  });
+  return Object.values(map).sort((a,b)=>b.total-a.total);
+}
+function renderDeployTracker(){
+  const rows=data.deployTracker;
+  const c=dtCounts(rows);
+  const sum=document.getElementById('dtSummary'); sum.innerHTML='';
+  [['Total items',c.total],['Done',c.done],['In progress',c.prog],['Not started',c.ns],['Complete',c.pct+'%']].forEach(([k,v],i)=>{
+    const d=document.createElement('div'); d.className='card'+(i===4?' feature':''); d.innerHTML='<div class="k">'+k+'</div><div class="v">'+v+'</div>'; sum.appendChild(d);
+  });
+  const pb=document.getElementById('dtPhaseBody'); pb.innerHTML='';
+  const phases=[]; rows.forEach(r=>{ if(!phases.includes(r.phase)) phases.push(r.phase); });
+  phases.forEach(ph=>{
+    const cc=dtCounts(rows.filter(r=>r.phase===ph));
+    const tr=document.createElement('tr');
+    tr.innerHTML='<td style="font-weight:700">'+ph+'</td><td class="num">'+cc.done+'</td><td class="num">'+cc.prog+'</td><td class="num">'+cc.ns+'</td>'
+      +'<td><div class="bararea" style="height:7px;background:var(--sky);border-radius:999px;overflow:hidden"><div style="height:100%;width:'+cc.pct+'%;background:var(--teal);border-radius:999px"></div></div><small class="note">'+cc.pct+'% complete</small></td>';
+    pb.appendChild(tr);
+  });
+  const tb=document.getElementById('deployTrackerBody'); tb.innerHTML='';
+  let lastPhase=null;
+  rows.forEach((r,idx)=>{
+    if(r.phase!==lastPhase){ lastPhase=r.phase;
+      const g=document.createElement('tr'); g.className='grp';
+      const gc=document.createElement('td'); gc.colSpan=9;
+      gc.textContent=r.phase;
+      if(currentMode()==='internal'){ gc.contentEditable=true; const old=r.phase;
+        gc.oninput=()=>{ const nw=gc.textContent.trim(); rows.forEach(x=>{ if(x.phase===old)x.phase=nw; }); scheduleSave(); };
+      }
+      g.appendChild(gc); tb.appendChild(g);
+    }
+    const tr=document.createElement('tr');
+    const nm=document.createElement('td'); nm.className='rownum'; nm.textContent=r.n||(idx+1); tr.appendChild(nm);
+    addDel(nm, ()=>{ data.deployTracker.splice(data.deployTracker.indexOf(r),1); renderDeployTracker(); renderOwnerRollup(); });
+    tr.appendChild(ed(r.wave,v=>r.wave=v));
+    tr.appendChild(ed(r.cat,v=>r.cat=v));
+    tr.appendChild(ed(r.item,v=>r.item=v));
+    const ow=ed(r.owner,v=>r.owner=v); ow.className='internal-only'; ow.addEventListener('input',()=>renderOwnerRollup()); tr.appendChild(ow);
+    const st=document.createElement('td');
+    const sel=document.createElement('select'); sel.className='status '+dtCls(r.status);
+    DT_ST.forEach(([s])=>{const o=document.createElement('option');o.value=s;o.textContent=s;if(s===r.status)o.selected=true;sel.appendChild(o);});
+    sel.onchange=()=>{r.status=sel.value;renderDeployTracker();renderOwnerRollup();scheduleSave();};
+    st.appendChild(sel); tr.appendChild(st);
+    const dcell=document.createElement('td');
+    const di=document.createElement('input'); di.type='date'; di.value=r.date||'';
+    di.onchange=()=>{ r.date=di.value; renderOwnerRollup(); scheduleSave(); };
+    dcell.appendChild(di); tr.appendChild(dcell);
+    // sub-items — checkable; unchecked ones keep the line item incomplete
+    const q=document.createElement('td');
+    if(!Array.isArray(r.sub)) r.sub=[];
+    const ul=document.createElement('ul'); ul.className='subs';
+    r.sub.forEach((s,si)=>{
+      const li=document.createElement('li');
+      const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=!!s.done;
+      cb.onchange=()=>{ s.done=cb.checked; renderDeployTracker(); renderOwnerRollup(); scheduleSave(); };
+      const sp=document.createElement('span'); sp.contentEditable=true; sp.textContent=s.t||'';
+      if(s.done) sp.style.textDecoration='line-through';
+      sp.oninput=()=>{ s.t=sp.textContent; scheduleSave(); };
+      const x=document.createElement('button'); x.className='delrow internal-only'; x.textContent='✕'; x.title='Remove sub-item';
+      x.style.marginRight='0'; x.style.marginLeft='4px';
+      x.onclick=()=>{ r.sub.splice(si,1); renderDeployTracker(); renderOwnerRollup(); scheduleSave(); };
+      li.appendChild(cb); li.appendChild(sp); li.appendChild(x); ul.appendChild(li);
+    });
+    q.appendChild(ul);
+    const checked=r.sub.filter(s=>s.done).length;
+    const prog=document.createElement('div'); prog.className='subprog';
+    prog.textContent=r.sub.length?(checked+'/'+r.sub.length+' checked'+(dtRowComplete(r)?' · complete':'')):'no sub-items';
+    q.appendChild(prog);
+    const addBtn=document.createElement('button'); addBtn.className='addsub internal-only'; addBtn.textContent='+ add sub-item';
+    addBtn.onclick=()=>{ r.sub.push({t:'',done:false}); renderDeployTracker(); scheduleSave(); };
+    q.appendChild(addBtn);
+    tr.appendChild(q);
+    const note=ed(r.note,v=>r.note=v); note.className='internal-only'; tr.appendChild(note);
+    tb.appendChild(tr);
+  });
+  renderOwnerRollup();
+}
+function addDTRow(){ data.deployTracker.push({n:data.deployTracker.length+1,phase:"Hypercare",wave:"",cat:"",item:"",owner:"",status:"Not started",target:"",date:"",sub:[{t:"",done:false}],note:""}); renderDeployTracker(); scheduleSave(); }
+
+/* ---------- RACI ---------- */
+function raciCls(v){ v=(v||'').toUpperCase(); if(v.includes('A'))return 'rc-a'; if(v.includes('R'))return 'rc-r'; if(v.includes('C'))return 'rc-c'; if(v.includes('I'))return 'rc-i'; return ''; }
+function renderRaci(){
+  const rc=data.raci;
+  document.getElementById('raciLegend').textContent=rc.legend||'';
+  const head=document.getElementById('raciHead'); head.innerHTML='<th style="width:170px">Activity</th>';
+  (rc.roles||[]).forEach(ro=>{const th=document.createElement('th');th.style.textAlign='center';th.textContent=ro;head.appendChild(th);});
+  const tb=document.getElementById('raciBody'); tb.innerHTML='';
+  (rc.rows||[]).forEach(r=>{
+    const tr=document.createElement('tr');
+    const actTd=ed(r.act,v=>r.act=v); tr.appendChild(actTd);
+    addDel(actTd, ()=>{ rc.rows.splice(rc.rows.indexOf(r),1); renderRaci(); });
+    (r.r||[]).forEach((val,i)=>{
+      const td=document.createElement('td'); td.className='rc '+raciCls(val); td.contentEditable=true; td.textContent=val||'';
+      td.oninput=()=>{r.r[i]=td.textContent.trim(); td.className='rc '+raciCls(r.r[i]); scheduleSave();};
+      tr.appendChild(td);
+    });
+    tb.appendChild(tr);
+  });
+}
+
+/* ---------- Readiness + Go/No-Go ---------- */
+const RS_ST=[["Pending","st-open"],["In progress","st-prog"],["Complete","st-done"],["Blocked","st-block"]];
+function rsCls(s){const m=RS_ST.find(x=>x[0]===s);return m?m[1]:'st-open';}
+function statusSelectCell(obj){
+  const st=document.createElement('td');
+  const sel=document.createElement('select'); sel.className='status '+rsCls(obj.status);
+  RS_ST.forEach(([s])=>{const o=document.createElement('option');o.value=s;o.textContent=s;if(s===obj.status)o.selected=true;sel.appendChild(o);});
+  sel.onchange=()=>{obj.status=sel.value;sel.className='status '+rsCls(obj.status);scheduleSave();};
+  st.appendChild(sel); return st;
+}
+function renderReadiness(){
+  const rows=data.deployReadiness;
+  const done=rows.filter(r=>r.status==='Complete').length;
+  const prog=rows.filter(r=>r.status==='In progress').length;
+  const blocked=rows.filter(r=>r.status==='Blocked').length;
+  const pct=rows.length?Math.round(done/rows.length*100):0;
+  const sum=document.getElementById('readySummary');
+  if(sum){ sum.innerHTML='';
+    [['Readiness',pct+'%'],['Complete',done+'/'+rows.length],['In progress',prog],['Blocked',blocked]].forEach(([k,v],i)=>{
+      const d=document.createElement('div'); d.className='card'+(i===0?' feature':''); d.innerHTML='<div class="k">'+k+'</div><div class="v">'+v+'</div>'; sum.appendChild(d);
+    });
+  }
+  const tb=document.getElementById('readyBody'); tb.innerHTML='';
+  let lastGroup=null;
+  data.deployReadiness.forEach(r=>{
+    if(r.group!==lastGroup){ lastGroup=r.group;
+      const g=document.createElement('tr'); g.className='grp'; const gc=document.createElement('td'); gc.colSpan=4;
+      gc.contentEditable=true; gc.textContent=r.group;
+      gc.oninput=()=>{ const old=r.group, nw=gc.textContent.trim(); data.deployReadiness.forEach(x=>{ if(x.group===old)x.group=nw; }); scheduleSave(); };
+      g.appendChild(gc); tb.appendChild(g);
+    }
+    const tr=document.createElement('tr');
+    const areaTd=ed(r.area,v=>r.area=v); tr.appendChild(areaTd);
+    addDel(areaTd, ()=>{ data.deployReadiness.splice(data.deployReadiness.indexOf(r),1); renderReadiness(); });
+    tr.appendChild(ed(r.criteria,v=>r.criteria=v));
+    tr.appendChild(ed(r.owner,v=>r.owner=v));
+    tr.appendChild(statusSelectCell(r));
+    tb.appendChild(tr);
+  });
+}
+function bindEditable(el,get,set){
+  if(!el) return; el.textContent=get()||'—';
+  if(currentMode()==='internal'){ el.contentEditable=true; el.oninput=()=>{ set(el.textContent.trim()); scheduleSave(); }; }
+  else { el.contentEditable=false; }
+}
+function renderGoNoGo(){
+  const g=data.goNoGo;
+  bindEditable(document.getElementById('gngOwner'), ()=>g.owner, v=>g.owner=v);
+  bindEditable(document.getElementById('gngApprover'), ()=>g.approver, v=>g.approver=v);
+  const cb=document.getElementById('gngBody'); cb.innerHTML='';
+  (g.criteria||[]).forEach(r=>{
+    const tr=document.createElement('tr');
+    const areaTd=ed(r.area,v=>r.area=v); tr.appendChild(areaTd);
+    addDel(areaTd, ()=>{ g.criteria.splice(g.criteria.indexOf(r),1); renderGoNoGo(); });
+    tr.appendChild(ed(r.criteria,v=>r.criteria=v));
+    tr.appendChild(ed(r.owner,v=>r.owner=v));
+    tr.appendChild(statusSelectCell(r));
+    cb.appendChild(tr);
+  });
+}
+
+/* ---------- Gantt ---------- */
+function renderGantt(){
+  const head=document.getElementById('ganttHead');head.innerHTML='<th class="phasecell">Phase</th>';
+  for(let w=1;w<=WEEKS;w++){const th=document.createElement('th');th.className='wk';th.textContent='W'+w;head.appendChild(th);}
+  const tb=document.getElementById('ganttBody');tb.innerHTML='';
+  data.gantt.forEach(r=>{
+    const tr=document.createElement('tr');
+    const p=document.createElement('td');p.className='phasecell';
+    const nm=document.createElement('div');nm.contentEditable=true;nm.textContent=r.phase;nm.oninput=()=>{r.phase=nm.textContent;scheduleSave();};
+    const ctl=document.createElement('div');ctl.className='miletip internal-only';
+    const si=document.createElement('input');si.type='number';si.min=1;si.max=WEEKS;si.value=r.s;si.style.width='42px';
+    const ei=document.createElement('input');ei.type='number';ei.min=1;ei.max=WEEKS;ei.value=r.e;ei.style.width='42px';
+    si.onchange=()=>{r.s=Math.min(Math.max(1,+si.value),WEEKS);renderGantt();renderSummary();scheduleSave();};
+    ei.onchange=()=>{r.e=Math.min(Math.max(r.s,+ei.value),WEEKS);renderGantt();renderSummary();scheduleSave();};
+    ctl.append('start ',si,' end ',ei);
+    p.appendChild(nm);p.appendChild(ctl);
+    addDel(p, ()=>{ data.gantt.splice(data.gantt.indexOf(r),1); renderGantt(); renderSummary(); });
+    tr.appendChild(p);
+    for(let w=1;w<=WEEKS;w++){
+      const c=document.createElement('td');c.className='cell';
+      if(w===r.s){const bar=document.createElement('div');bar.className='bar';bar.style.background=r.color||'var(--green)';
+        const span=(r.e-r.s+1);bar.style.width='calc('+span+'00% + '+(span-1)+'px)';bar.style.left='2px';bar.textContent='W'+r.s+(r.e>r.s?('–W'+r.e):'');
+        c.appendChild(bar);c.style.overflow='visible';c.style.zIndex=2;}
+      tr.appendChild(c);
+    }
+    tb.appendChild(tr);
+  });
+}
+function addGanttRow(){data.gantt.push({stage:"setup",phase:"New timeline row",s:1,e:1,color:"var(--green)"});renderGantt();renderSummary();scheduleSave();}
+
+/* ---------- Export / import / reset ---------- */
+function doExport(){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='Daybreak-roadmap-'+new Date().toISOString().slice(0,10)+'.json';a.click();
+}
+document.getElementById('fileInput').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;const rd=new FileReader();
+  rd.onload=()=>{try{const d=JSON.parse(rd.result);applyData(d);scheduleSave();}catch(err){alert('Could not read that file.');}};
+  rd.readAsText(f);e.target.value='';
+});
+function resetAll(){if(confirm('Reset the shared roadmap back to the starting template? This overwrites everyone’s data.')){applyData(clone(DEFAULT));scheduleSave();}}
+
+function renderAll(){
+  renderHeaders();
+  renderAbout();
+  renderSummary();
+  renderPath();
+  renderOwnerRollup();
+  renderSupport();
+  renderStakeholders();
+  renderTeamLinks();
+  renderPerformance();
+  renderPhaseHeads();
+  renderTracker();
+  renderDiscForm();
+  renderPhaseTables();
+  renderCadence();
+  renderBau();
+  renderDeployTracker();
+  renderRaci();
+  renderReadiness();
+  renderGoNoGo();
+  renderDecision();
+  renderActions();
+  renderRecaps();
+  renderMaturity();
+  renderGantt();
+  renderEow();
+  applyEowLock();
+}
+
+/* ---------- wire buttons ---------- */
+document.getElementById('btnImport').addEventListener('click',()=>document.getElementById('fileInput').click());
+document.getElementById('btnExport').addEventListener('click',doExport);
+document.getElementById('btnPrint').addEventListener('click',()=>window.print());
+document.getElementById('btnReset').addEventListener('click',resetAll);
+document.getElementById('btnAddTracker').addEventListener('click',addTrackerRow);
+document.getElementById('btnAddSetup').addEventListener('click',()=>addSetupRow('setup'));
+document.getElementById('btnAddDeploy').addEventListener('click',()=>addSetupRow('deployment'));
+document.getElementById('btnAddGolive').addEventListener('click',()=>addSetupRow('golive'));
+document.getElementById('btnAddBau').addEventListener('click',addBauRow);
+document.getElementById('btnAddGantt').addEventListener('click',addGanttRow);
+document.getElementById('btnAddDT').addEventListener('click',addDTRow);
+document.getElementById('btnAddSupport').addEventListener('click',addSupportRow);
+document.getElementById('btnAddTrackerCol').addEventListener('click',addTrackerCol);
+document.getElementById('btnAddCadence').addEventListener('click',()=>addFlexRow(CFG_CADENCE));
+document.getElementById('btnAddCadenceCol').addEventListener('click',()=>addFlexCol(CFG_CADENCE));
+document.getElementById('btnAddBauCol').addEventListener('click',()=>addFlexCol(CFG_BAU));
+document.getElementById('btnAddDecision').addEventListener('click',()=>addFlexRow(CFG_DECISION));
+document.getElementById('btnAddDecisionCol').addEventListener('click',()=>addFlexCol(CFG_DECISION));
+document.getElementById('btnExtract').addEventListener('click',previewRecap);
+document.getElementById('btnUploadRecap').addEventListener('click',()=>document.getElementById('recapFile').click());
+document.getElementById('btnAddStakeholder').addEventListener('click',()=>addStakeholderRow(false));
+document.getElementById('btnAddDL').addEventListener('click',()=>addStakeholderRow(true));
+document.getElementById('btnAddStakeholderCol').addEventListener('click',addStakeholderCol);
+document.getElementById('btnAddTeamLink').addEventListener('click',addTeamLinkRow);
+document.getElementById('btnAddPerf').addEventListener('click',addPerfRow);
+document.getElementById('btnEowLock').addEventListener('click',toggleEowLock);
+document.getElementById('recapFile').addEventListener('change',e=>{ const f=e.target.files[0]; if(f) handleRecapFile(f); e.target.value=''; });
+document.getElementById('btnAddAction').addEventListener('click',addActionRow);
+document.getElementById('btnAddFramework').addEventListener('click',addFramework);
+document.getElementById('btnGenEow').addEventListener('click',renderEow);
+document.getElementById('btnCopyEow').addEventListener('click',copyEow);
+(function(){ const d=document.getElementById('recapDate'); if(d && !d.value) d.value=new Date().toISOString().slice(0,10); })();
+</script>
+</body>
+</html>

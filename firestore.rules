@@ -1,0 +1,27 @@
+rules_version = '2';
+
+// Daybreak Tracker — Firestore security rules.
+//
+// Only a signed-in user can read or write the tracker. Because the
+// team uses a SINGLE shared Email/Password account (see README), the
+// team password is what gates the database — not just the page.
+// Anyone without that password cannot authenticate, and without a
+// valid auth token these rules deny all reads and writes.
+//
+// Deploy: paste into Firebase Console → Firestore Database → Rules → Publish
+// (or run `firebase deploy --only firestore:rules`).
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // The shared tracker document(s).
+    match /trackers/{docId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Everything else is locked down.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
