@@ -153,6 +153,12 @@
   /* delete-row / delete-column controls (internal only) */
   .delrow{border:none;background:var(--risk-soft);color:#8a3a24;font-family:var(--sansHead);font-weight:700;font-size:11px;line-height:1;width:18px;height:18px;border-radius:50%;cursor:pointer;margin-right:6px;padding:0;vertical-align:middle;}
   .delrow:hover{background:var(--risk);color:#fff;}
+  .edtext{display:inline-block;min-width:24px;outline:none;white-space:pre-wrap;word-break:break-word;}
+  .movebtn{border:1px solid var(--line);background:#f4f6f5;color:var(--green);font-size:10px;line-height:1;width:16px;height:16px;border-radius:4px;cursor:pointer;padding:0;margin-right:2px;vertical-align:middle;}
+  .movebtn:hover{background:var(--teal);color:#fff;}
+  .sla-met{color:#0a7d3c;font-weight:700;white-space:nowrap;}
+  .sla-miss{color:#b23b1e;font-weight:700;white-space:nowrap;}
+  .sla-none{color:var(--muted);}
   .delcol{border:none;background:rgba(255,255,255,.22);color:#fff;font-weight:700;font-size:10px;line-height:1;width:16px;height:16px;border-radius:50%;cursor:pointer;margin-left:6px;padding:0;}
   .delcol:hover{background:var(--risk);}
   th .colhd{display:inline-flex;align-items:center;gap:2px;}
@@ -493,6 +499,8 @@
             <th style="width:120px" class="internal-only">Owner</th>
             <th style="width:120px">Status</th>
             <th style="width:140px">Target date</th>
+            <th style="width:140px">Date completed</th>
+            <th style="width:110px">SLA</th>
             <th style="width:260px">Sub-items / to review</th>
             <th style="width:180px" class="internal-only">Progress notes</th>
           </tr>
@@ -884,7 +892,22 @@ function applyData(d){
   if(!data.meta.phaseStatus) data.meta.phaseStatus=clone(DEFAULT.meta.phaseStatus);
   PHASES.forEach(p=>{ if(!data.meta.phaseStatus[p.id]) data.meta.phaseStatus[p.id]='Not started'; });
   if(!data.meta.phaseOwners || typeof data.meta.phaseOwners!=='object') data.meta.phaseOwners=clone(DEFAULT.meta.phaseOwners);
+  // one-time cleanup: strip the stray delete-button glyph (✕) that older builds saved into cell text
+  if(scrubX(data)) scheduleSave();
   renderAll();
+}
+// recursively remove the ✕ glyph from every string value; returns true if anything changed
+function scrubX(o){
+  let changed=false;
+  if(Array.isArray(o)){ o.forEach(v=>{ if(scrubX(v)) changed=true; }); }
+  else if(o && typeof o==='object'){
+    for(const k in o){
+      const v=o[k];
+      if(typeof v==='string'){ if(v.indexOf('✕')>=0){ o[k]=v.replace(/✕/g,''); changed=true; } }
+      else if(v && typeof v==='object'){ if(scrubX(v)) changed=true; }
+    }
+  }
+  return changed;
 }
 function scheduleSave(){
   setSync('saving');
@@ -1015,13 +1038,40 @@ function renderPath(){
 /* ---------- shared cell helpers ---------- */
 const STATUSES=[["Open","st-open"],["In progress","st-prog"],["Complete","st-done"],["Blocked","st-block"],["N/A","st-na"]];
 function cls(s){const m=STATUSES.find(x=>x[0]===s);return m?m[1]:'st-open';}
-function ed(val,cb){const td=document.createElement('td');td.contentEditable=true;td.textContent=val||'';td.oninput=()=>{cb(td.textContent);scheduleSave();};return td;}
+function ed(val,cb){const td=document.createElement('td');const sp=document.createElement('span');sp.className='edtext';sp.contentEditable=true;sp.textContent=(val==null?'':String(val)).replace(/✕/g,'');sp.oninput=()=>{cb(sp.textContent);scheduleSave();};td.appendChild(sp);return td;}
 function roleCell(r,key,recalc){const td=document.createElement('td');td.className='num internal-only';td.contentEditable=true;td.textContent=r[key];td.oninput=()=>{r[key]=parseFloat(td.textContent.replace(/[^0-9.]/g,''))||0;recalc();scheduleSave();};return td;}
 // prepend a small delete-row button into a row's first cell (internal only)
 function addDel(firstTd, onDel){
   const b=document.createElement('button'); b.className='delrow internal-only'; b.title='Delete this row'; b.textContent='✕';
   b.onclick=e=>{ e.stopPropagation(); onDel(); scheduleSave(); };
   firstTd.insertBefore(b, firstTd.firstChild);
+}
+// swap a row with its immediate neighbour; refuses to cross a group boundary
+function moveRow(arr, r, dir, sameGroup){
+  const i=arr.indexOf(r); if(i<0) return;
+  const j=i+dir; if(j<0||j>=arr.length) return;
+  if(sameGroup && !sameGroup(arr[j], r)) return;
+  const t=arr[i]; arr[i]=arr[j]; arr[j]=t;
+}
+// prepend ▲ ▼ reorder buttons into a row's first cell (internal only)
+function addMove(firstTd, arr, r, rerender, sameGroup){
+  const dn=document.createElement('button'); dn.className='movebtn internal-only'; dn.textContent='▼'; dn.title='Move down';
+  dn.onclick=e=>{ e.stopPropagation(); moveRow(arr,r,1,sameGroup); rerender(); scheduleSave(); };
+  const up=document.createElement('button'); up.className='movebtn internal-only'; up.textContent='▲'; up.title='Move up';
+  up.onclick=e=>{ e.stopPropagation(); moveRow(arr,r,-1,sameGroup); rerender(); scheduleSave(); };
+  firstTd.insertBefore(dn, firstTd.firstChild);
+  firstTd.insertBefore(up, firstTd.firstChild);
+}
+// SLA for a deploy tracker row: compares completed date vs target date
+function dtSLA(r){
+  const t=r.date?new Date(r.date):null;
+  const d=r.doneDate?new Date(r.doneDate):null;
+  if(!d||isNaN(d)) return {txt:'—',cls:'sla-none'};
+  if(!t||isNaN(t)) return {txt:'done',cls:'sla-none'};
+  const days=Math.round((d-t)/86400000);
+  const met=days<=0;
+  const sign=days>0?'+':'';
+  return {txt:(met?'Met':'Missed')+' ('+sign+days+'d)', cls:met?'sla-met':'sla-miss'};
 }
 
 /* ---------- About / Support library / Owner rollup ---------- */
@@ -1228,6 +1278,7 @@ function renderTracker(){
     const tr=document.createElement('tr');
     const nm=document.createElement('td'); nm.className='rownum col-num'; nm.textContent=i+1; tr.appendChild(nm);
     addDel(nm, ()=>{ data.tracker.splice(data.tracker.indexOf(r),1); renderTracker(); renderChips(); renderPath(); renderSummary(); });
+    addMove(nm, data.tracker, r, ()=>{ renderTracker(); renderChips(); renderPath(); renderSummary(); }, null);
     data.discColumns.forEach(col=>{
       const k=col.key;
       if(col.status){
@@ -1324,6 +1375,7 @@ function renderSetupTable(phase, body, foot, cards){
     const tr=document.createElement('tr');
     const wsTd=ed(r.ws,v=>r.ws=v); tr.appendChild(wsTd);
     addDel(wsTd, ()=>{ data.setup.splice(data.setup.indexOf(r),1); renderPhaseTables(); renderSummary(); renderPath(); });
+    addMove(wsTd, data.setup, r, ()=>{ renderPhaseTables(); renderSummary(); renderPath(); }, (a,b)=>a.phase===b.phase);
     tr.appendChild(roleCell(r,'pl',recalc));
     tr.appendChild(roleCell(r,'tl',recalc));
     tr.appendChild(roleCell(r,'qa',recalc));
@@ -1445,6 +1497,7 @@ function renderActions(){
     const tr=document.createElement('tr');
     const nm=document.createElement('td'); nm.className='rownum'; nm.textContent=i+1; tr.appendChild(nm);
     addDel(nm, ()=>{ data.actionTracker.splice(data.actionTracker.indexOf(r),1); renderActions(); });
+    addMove(nm, data.actionTracker, r, ()=>renderActions(), null);
     tr.appendChild(ed(r.item,v=>r.item=v));
     tr.appendChild(ed(r.owner,v=>r.owner=v));
     const tyTd=document.createElement('td');
@@ -1842,7 +1895,7 @@ function renderDeployTracker(){
   rows.forEach((r,idx)=>{
     if(r.phase!==lastPhase){ lastPhase=r.phase;
       const g=document.createElement('tr'); g.className='grp';
-      const gc=document.createElement('td'); gc.colSpan=9;
+      const gc=document.createElement('td'); gc.colSpan=11;
       gc.textContent=r.phase;
       if(currentMode()==='internal'){ gc.contentEditable=true; const old=r.phase;
         gc.oninput=()=>{ const nw=gc.textContent.trim(); rows.forEach(x=>{ if(x.phase===old)x.phase=nw; }); scheduleSave(); };
@@ -1852,6 +1905,7 @@ function renderDeployTracker(){
     const tr=document.createElement('tr');
     const nm=document.createElement('td'); nm.className='rownum'; nm.textContent=r.n||(idx+1); tr.appendChild(nm);
     addDel(nm, ()=>{ data.deployTracker.splice(data.deployTracker.indexOf(r),1); renderDeployTracker(); renderOwnerRollup(); });
+    addMove(nm, data.deployTracker, r, ()=>{ renderDeployTracker(); renderOwnerRollup(); }, (a,b)=>a.phase===b.phase);
     tr.appendChild(ed(r.wave,v=>r.wave=v));
     tr.appendChild(ed(r.cat,v=>r.cat=v));
     tr.appendChild(ed(r.item,v=>r.item=v));
@@ -1863,8 +1917,15 @@ function renderDeployTracker(){
     st.appendChild(sel); tr.appendChild(st);
     const dcell=document.createElement('td');
     const di=document.createElement('input'); di.type='date'; di.value=r.date||'';
-    di.onchange=()=>{ r.date=di.value; renderOwnerRollup(); scheduleSave(); };
+    di.onchange=()=>{ r.date=di.value; renderDeployTracker(); renderOwnerRollup(); scheduleSave(); };
     dcell.appendChild(di); tr.appendChild(dcell);
+    // date completed
+    const ccell=document.createElement('td');
+    const ci=document.createElement('input'); ci.type='date'; ci.value=r.doneDate||'';
+    ci.onchange=()=>{ r.doneDate=ci.value; renderDeployTracker(); scheduleSave(); };
+    ccell.appendChild(ci); tr.appendChild(ccell);
+    // SLA — completed vs target
+    const slaCell=document.createElement('td'); const sla=dtSLA(r); slaCell.textContent=sla.txt; slaCell.className=sla.cls; tr.appendChild(slaCell);
     // sub-items — checkable; unchecked ones keep the line item incomplete
     const q=document.createElement('td');
     if(!Array.isArray(r.sub)) r.sub=[];
@@ -1895,7 +1956,7 @@ function renderDeployTracker(){
   });
   renderOwnerRollup();
 }
-function addDTRow(){ data.deployTracker.push({n:data.deployTracker.length+1,phase:"Hypercare",wave:"",cat:"",item:"",owner:"",status:"Not started",target:"",date:"",sub:[{t:"",done:false}],note:""}); renderDeployTracker(); scheduleSave(); }
+function addDTRow(){ data.deployTracker.push({n:data.deployTracker.length+1,phase:"Hypercare",wave:"",cat:"",item:"",owner:"",status:"Not started",target:"",date:"",doneDate:"",sub:[{t:"",done:false}],note:""}); renderDeployTracker(); scheduleSave(); }
 
 /* ---------- RACI ---------- */
 function raciCls(v){ v=(v||'').toUpperCase(); if(v.includes('A'))return 'rc-a'; if(v.includes('R'))return 'rc-r'; if(v.includes('C'))return 'rc-c'; if(v.includes('I'))return 'rc-i'; return ''; }
