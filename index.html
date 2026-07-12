@@ -361,17 +361,9 @@
       </div>
     </div>
 
-    <h3 class="block" data-hkey="master">Master timeline — signing to go-live</h3>
-    <div class="legend">
-      <span><span class="sw" style="background:var(--green)"></span> Recruitment &amp; enablement</span>
-      <span><span class="sw" style="background:var(--teal)"></span> Training</span>
-      <span><span class="sw" style="background:var(--lavender)"></span> Nesting / production ramp</span>
-      <span><span class="sw" style="background:var(--ok-bright)"></span> Go-live</span>
-    </div>
-    <div class="gantt">
-      <table id="ganttTbl"><thead><tr id="ganttHead"></tr></thead><tbody id="ganttBody"></tbody></table>
-    </div>
-    <div class="addrow internal-only"><button class="btn btn--ghost" id="btnAddGantt">+ Add timeline row</button></div>
+    <h3 class="block" data-hkey="master">Master timeline</h3>
+    <p class="note">The full delivery timeline now lives in one place — <b>Gantt &amp; SLA</b> — showing all eight workstreams across the maturity gates, with target dates and SLA tracking.</p>
+    <div style="margin:6px 0 4px"><button class="btn btn--ghost" id="btnGoGantt">Open Gantt &amp; SLA →</button></div>
 
     <div class="internal-only">
       <h3 class="block" data-hkey="support">Reference &amp; support library</h3>
@@ -635,7 +627,7 @@
       <span class="spacer"></span>
       <button class="backlink" data-back>← Roadmap</button>
     </div>
-    <p class="lead">Upload or paste a meeting transcript and it surfaces the <b>likely action items</b> and <b>strategic milestones</b> for you to review. Nothing is added automatically — check the ones that matter and click <b>Add</b> to push each into the tracker (or a milestone onto the <b>Gantt timeline</b>). Edit the wording, owner or type before you add. Save the meeting to your recap history when you're done. Everything runs right here in your browser.</p>
+    <p class="lead">Upload or paste a meeting transcript and it surfaces the <b>likely action items</b> and <b>strategic milestones</b> for you to review. Nothing is added automatically — check the ones that matter and click <b>Add</b> to push each into the tracker (or a milestone into the <b>EOW report</b>). Edit the wording, owner or type before you add. Save the meeting to your recap history when you're done. Everything runs right here in your browser.</p>
 
     <h3 class="block">Upload recap</h3>
     <div class="recapform">
@@ -1859,14 +1851,14 @@ function renderCandidates(){
     });
   }
   if(c.milestones.length){
-    const h=document.createElement('div'); h.className='candgrp'; h.textContent='Possible strategic milestones (→ Gantt)'; box.appendChild(h);
+    const h=document.createElement('div'); h.className='candgrp'; h.textContent='Possible strategic milestones (→ EOW report)'; box.appendChild(h);
     c.milestones.forEach(m=>{
       const row=document.createElement('div'); row.className='cand'+(m._added?' added':'');
       const item=document.createElement('input'); item.type='text'; item.className='c-item'; item.value=m.phase.replace(/^★\s*/,''); item.oninput=()=>item.value;
       const wk=document.createElement('input'); wk.type='number'; wk.min=1; wk.max=WEEKS; wk.className='c-week'; wk.value=m.week||1; wk.onchange=()=>m.week=Math.min(Math.max(1,+wk.value),WEEKS);
       const lab=document.createElement('span'); lab.className='note'; lab.textContent='Week';
       const btn=document.createElement('button'); btn.className='btn btn--ghost';
-      const paint=()=>{ btn.textContent=m._added?'✓ Added':'Add to Gantt'; btn.disabled=m._added; row.className='cand'+(m._added?' added':''); };
+      const paint=()=>{ btn.textContent=m._added?'✓ Added':'Add'; btn.disabled=m._added; row.className='cand'+(m._added?' added':''); };
       btn.onclick=()=>{ if(m._added) return; const w=Math.min(Math.max(1,+wk.value||1),WEEKS); data.gantt.push({stage:'milestone',phase:'★ '+item.value,s:w,e:w,color:'#7c3aed',milestone:true}); m._added=true; c.addedM++; paint(); renderGantt(); renderSummary(); scheduleSave(); };
       row.append(item,lab,wk,btn); box.appendChild(row); paint();
     });
@@ -2278,7 +2270,7 @@ function renderGoNoGo(){
 
 /* ---------- Gantt ---------- */
 function renderGantt(){
-  const head=document.getElementById('ganttHead');head.innerHTML='<th class="phasecell">Phase</th>';
+  const head=document.getElementById('ganttHead');if(!head)return;head.innerHTML='<th class="phasecell">Phase</th>';
   for(let w=1;w<=WEEKS;w++){const th=document.createElement('th');th.className='wk';th.textContent='W'+w;head.appendChild(th);}
   const tb=document.getElementById('ganttBody');tb.innerHTML='';
   data.gantt.forEach(r=>{
@@ -2359,7 +2351,7 @@ document.getElementById('btnAddSetup').addEventListener('click',()=>addSetupRow(
 document.getElementById('btnAddDeploy').addEventListener('click',()=>addSetupRow('deployment'));
 document.getElementById('btnAddGolive').addEventListener('click',()=>addSetupRow('golive'));
 document.getElementById('btnAddBau').addEventListener('click',addBauRow);
-document.getElementById('btnAddGantt').addEventListener('click',addGanttRow);
+document.getElementById('btnGoGantt').addEventListener('click',()=>goTo('tgantt'));
 document.getElementById('btnAddDT').addEventListener('click',addDTRow);
 document.getElementById('btnAddSupport').addEventListener('click',addSupportRow);
 document.getElementById('btnAddTrackerCol').addEventListener('click',addTrackerCol);
