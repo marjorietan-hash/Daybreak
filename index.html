@@ -1267,10 +1267,10 @@ function renderWsGantt(){
   let m=new Date(axisStart);
   while(m<axisEnd){ const next=new Date(m.getFullYear(),m.getMonth()+1,1);
     const el=document.createElement('div'); el.className='gmonth'; el.style.left=xp(m)+'%'; el.style.width=(xp(next>axisEnd?axisEnd:next)-xp(m))+'%';
-    el.textContent=MON[m.getMonth()]+' '+String(m.getFullYear()).slice(2); months.appendChild(el); m=next; }
+    el.textContent=MON[m.getMonth()]+' '+m.getFullYear(); months.appendChild(el); m=next; }
   ax.appendChild(months);
-  const weeks=document.createElement('div'); weeks.className='gweeks'; let wi=0;
-  for(let d=new Date(progStart); d<axisEnd; d=addDays(d,7)){ const el=document.createElement('div'); el.className='gweek'; el.style.left=xp(d)+'%'; el.textContent='W'+wi; weeks.appendChild(el); wi++; }
+  const weeks=document.createElement('div'); weeks.className='gweeks';
+  for(let d=new Date(progStart); d<axisEnd; d=addDays(d,7)){ const el=document.createElement('div'); el.className='gweek'; el.style.left=xp(d)+'%'; el.textContent=(d.getMonth()+1)+'/'+d.getDate(); weeks.appendChild(el); }
   ax.appendChild(weeks); hdr.appendChild(ax); host.appendChild(hdr);
 
   const today=new Date();
