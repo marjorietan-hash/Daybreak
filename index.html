@@ -719,6 +719,7 @@
       <button class="backlink" data-back>← Roadmap</button>
     </div>
     <p class="lead">One common governance language across all frameworks. Every capability moves through four levels — <b>Documented</b>, <b>Operationalized</b>, <b>Governed</b>, then <b>Optimized</b>. Tick the evidence as each is met; the level is awarded automatically once <em>all</em> criteria for that level (and the ones before it) are checked. <b>Governed</b> is the target — a capability at Governed is 100% mature; <b>Optimized</b> is the bonus stage for continuous improvement.</p>
+    <p class="note">This is the <b>evidence register</b> — the <em>whether, and how we know</em>: SOPs, success criteria, and owners behind each level. For the <em>when</em> — deadlines and SLA per gate — see <b>Gantt &amp; SLA</b>. Same four-rung ladder, two lenses. <button class="btn btn--ghost" id="btnGoTGantt" style="padding:2px 10px;font-size:12px;">Open Gantt &amp; SLA →</button></p>
 
     <h3 class="block">The model</h3>
     <div class="tablewrap">
@@ -746,7 +747,8 @@
       <span class="spacer"></span>
       <button class="backlink" data-back>← Roadmap</button>
     </div>
-    <p class="lead">Eight workstreams, one spine. Each moves through four maturity gates — <b>Setup</b> (Documented), <b>Deployment</b> (Operationalized), <b>Hypercare</b> (Governed), then <b>Optimized</b>. Encode a target date and a completed date per gate; the SLA pill turns on automatically. Read the bars as gates, not just dates.</p>
+    <p class="lead">Eight workstreams, one spine. Each moves through four maturity gates — <b>Setup</b> (L1 · Documented), <b>Deployment</b> (L2 · Operationalized), <b>Hypercare</b> (L3 · Governed), then <b>Optimized</b> (L4). Encode a target date and a completed date per gate; the SLA pill turns on automatically. Read the bars as gates, not just dates.</p>
+    <p class="note">This is the <b>schedule view</b> — the <em>when</em>: deadlines and SLA per gate. The <em>evidence</em> behind each gate — SOPs, success criteria, owners — lives in <b>Process Maturity</b>. Same four-rung ladder, two lenses. <button class="btn btn--ghost" id="btnGoMaturity" style="padding:2px 10px;font-size:12px;">Open Process Maturity →</button></p>
 
     <div class="gnav">
       <label class="glbl">Program start<input type="date" class="b-input dateinp" id="progStart"></label>
@@ -2352,6 +2354,8 @@ document.getElementById('btnAddDeploy').addEventListener('click',()=>addSetupRow
 document.getElementById('btnAddGolive').addEventListener('click',()=>addSetupRow('golive'));
 document.getElementById('btnAddBau').addEventListener('click',addBauRow);
 document.getElementById('btnGoGantt').addEventListener('click',()=>goTo('tgantt'));
+document.getElementById('btnGoMaturity').addEventListener('click',()=>goTo('maturity'));
+document.getElementById('btnGoTGantt').addEventListener('click',()=>goTo('tgantt'));
 document.getElementById('btnAddDT').addEventListener('click',addDTRow);
 document.getElementById('btnAddSupport').addEventListener('click',addSupportRow);
 document.getElementById('btnAddTrackerCol').addEventListener('click',addTrackerCol);
