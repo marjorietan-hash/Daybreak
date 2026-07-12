@@ -159,6 +159,38 @@
   .sla-met{color:#0a7d3c;font-weight:700;white-space:nowrap;}
   .sla-miss{color:#b23b1e;font-weight:700;white-space:nowrap;}
   .sla-none{color:var(--muted);}
+  /* transition gantt + workstream tracker */
+  .wslbl{font-weight:600;font-size:11.5px;color:#333;display:block;margin-bottom:4px;outline:none;}
+  .wsgate{display:flex;gap:5px;align-items:center;margin-bottom:4px;font-size:11px;color:var(--muted);}
+  .wsgate input[type=date]{font-size:11px;padding:2px 4px;}
+  .wscell{min-width:190px;}
+  .gnav{display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin:2px 0 12px;}
+  .gnav label{font-size:12.5px;font-weight:600;color:var(--green);display:flex;gap:6px;align-items:center;}
+  .gwrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;}
+  .gchart{min-width:820px;}
+  .ghdr{display:flex;border-bottom:1px solid var(--line);}
+  .gname{flex:0 0 190px;padding:7px 10px;font-weight:700;color:var(--green);font-size:11.5px;border-right:1px solid var(--line);background:#fafbfb;}
+  .gname small{display:block;font-weight:400;color:var(--muted);font-size:10px;margin-top:2px;}
+  .ghdr .gname{background:var(--green);color:#fff;display:flex;align-items:center;}
+  .gaxis{position:relative;flex:1;}
+  .gmonths{position:relative;height:20px;}
+  .gweeks{position:relative;height:15px;border-top:1px solid #eef1f0;}
+  .gmonth{position:absolute;top:0;height:20px;border-left:1px solid var(--line);font-size:10px;font-weight:700;color:var(--green);padding:3px 5px;overflow:hidden;white-space:nowrap;}
+  .gweek{position:absolute;top:0;height:15px;border-left:1px solid #eef1f0;font-size:8.5px;color:var(--muted);padding-left:2px;overflow:hidden;white-space:nowrap;}
+  .grow{display:flex;border-top:1px solid var(--line);}
+  .gtrack{position:relative;flex:1;min-height:34px;}
+  .gbar{position:absolute;top:9px;height:16px;border-radius:8px;color:#fff;font-size:9.5px;line-height:16px;padding:0 6px;white-space:nowrap;overflow:hidden;}
+  .gb-setup{background:var(--teal);}
+  .gb-deploy{background:#3f7d76;}
+  .gb-hyper{background:var(--green);}
+  .gb-opt{background:var(--lavender);color:var(--green);}
+  .gmark{position:absolute;top:7px;width:11px;height:11px;transform:rotate(45deg);border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.18);z-index:3;}
+  .gm-met{background:#0a7d3c;} .gm-miss{background:#b23b1e;} .gm-open{background:#c9a227;}
+  .gtoday{position:absolute;top:0;bottom:0;width:2px;background:var(--lavender);z-index:4;}
+  .glegend{display:flex;gap:16px;flex-wrap:wrap;font-size:11px;color:#444;margin:12px 0 0;}
+  .glegend span{display:inline-flex;align-items:center;gap:5px;}
+  .glegend i{width:12px;height:12px;border-radius:3px;display:inline-block;}
+  .glegend i.dia{border-radius:2px;transform:rotate(45deg);width:10px;height:10px;}
   .delcol{border:none;background:rgba(255,255,255,.22);color:#fff;font-weight:700;font-size:10px;line-height:1;width:16px;height:16px;border-radius:50%;cursor:pointer;margin-left:6px;padding:0;}
   .delcol:hover{background:var(--risk);}
   th .colhd{display:inline-flex;align-items:center;gap:2px;}
@@ -714,6 +746,37 @@
     </div>
     <div class="addrow internal-only"><button class="btn btn--ghost" id="btnAddFramework">+ Add framework</button></div>
   </section>
+
+  <!-- CONSOLIDATED GANTT & SLA -->
+  <section class="panel" id="p-tgantt">
+    <div class="phasehead">
+      <div><div class="eyebrow">Delivery · Workstreams × maturity gates</div><h2 class="section">Gantt &amp; SLA</h2></div>
+      <span class="spacer"></span>
+      <button class="backlink" data-back>← Roadmap</button>
+    </div>
+    <p class="lead">Eight workstreams, one spine. Each moves through four maturity gates — <b>Setup</b> (Documented), <b>Deployment</b> (Operationalized), <b>Hypercare</b> (Governed), then <b>Optimized</b>. Encode a target date and a completed date per gate; the SLA pill turns on automatically. Read the bars as gates, not just dates.</p>
+
+    <div class="gnav">
+      <label class="glbl">Program start<input type="date" class="b-input dateinp" id="progStart"></label>
+      <div class="glegend" id="wsLegend"></div>
+    </div>
+
+    <div class="grid cards summary" id="wsSummary"></div>
+
+    <h3 class="block">Gates &amp; deadlines</h3>
+    <div class="tablewrap" style="margin-top:6px">
+      <table id="wsTbl">
+        <thead><tr id="wsHead"></tr></thead>
+        <tbody id="wsBody"></tbody>
+      </table>
+    </div>
+    <div class="addrow internal-only"><button class="btn btn--ghost" id="btnAddWS">+ Add workstream</button></div>
+
+    <h3 class="block">Timeline</h3>
+    <div class="gwrap">
+      <div class="gchart" id="wsGantt"></div>
+    </div>
+  </section>
 </main>
 
 <input type="file" id="fileInput" accept="application/json" style="display:none" />
@@ -746,6 +809,27 @@ const PHASES = [
   {id:'deployment', n:'Deployment',          wk:'Weeks 5–8'},
   {id:'golive',     n:'Go Live / Hypercare', wk:'Week 9'},
   {id:'bau',        n:'BAU',                 wk:'Ongoing'}
+];
+
+/* ---------- consolidated workstreams · maturity-gate Gantt ---------- */
+const WS_PHASES = [
+  {key:'setup',  name:'Setup',       mat:'L1 · Documented',      cls:'gb-setup'},
+  {key:'deploy', name:'Deployment',  mat:'L2 · Operationalized', cls:'gb-deploy'},
+  {key:'hyper',  name:'Hypercare',   mat:'L3 · Governed',        cls:'gb-hyper'},
+  {key:'opt',    name:'Optimized',   mat:'L4 · Optimized',       cls:'gb-opt'}
+];
+// gate helper: {label, target ISO date, done ISO date|''}
+function G(label,target,done){ return {label:label||'', target:target||'', done:done||''}; }
+// 8 workstreams × maturity gates. gov=true streams (3,5,7) carry an L3/Hypercare gate.
+const WS_DEFAULT = [
+  {name:'SOP review & documentation',       gov:false, gates:{setup:G('SOPs documented','2026-08-10',''), deploy:G('SOPs in use','2026-09-07',''), hyper:G('',''), opt:G('Continuous SOP upkeep','2026-11-08','')}},
+  {name:'Process map & operating model',    gov:false, gates:{setup:G('Process mapped','2026-08-10',''), deploy:G('Operating model live','2026-09-07',''), hyper:G('',''), opt:G('Model optimized','2026-11-08','')}},
+  {name:'Operations framework & governance',gov:true,  gates:{setup:G('Framework drafted','2026-08-10',''), deploy:G('Framework operational','2026-09-09',''), hyper:G('Governance ratified','2026-11-08',''), opt:G('Governance optimized','2026-12-08','')}},
+  {name:'Training & certification',         gov:false, gates:{setup:G('Curriculum documented','2026-08-10',''), deploy:G('Team certified','2026-09-07',''), hyper:G('',''), opt:G('Ongoing certification','2026-11-08','')}},
+  {name:'Quality framework & rubric',       gov:true,  gates:{setup:G('Rubric documented','2026-08-10',''), deploy:G('QA operational','2026-09-09',''), hyper:G('QA governed','2026-11-08',''), opt:G('QA optimized','2026-12-08','')}},
+  {name:'Historical data & capacity',       gov:false, gates:{setup:G('Baseline locked','2026-08-10',''), deploy:G('Capacity model live','2026-09-07',''), hyper:G('',''), opt:G('Capacity tuned','2026-11-08','')}},
+  {name:'TS→MS transition & comms',         gov:true,  gates:{setup:G('Transition plan documented','2026-08-10',''), deploy:G('Ownership transferred','2026-09-09',''), hyper:G('Transition governed','2026-11-08',''), opt:G('Steady state','2026-12-08','')}},
+  {name:'Recruitment & hiring',             gov:false, gates:{setup:G('Roles defined','2026-07-31',''), deploy:G('Team hired','2026-09-07',''), hyper:G('',''), opt:G('Backfill pipeline','2026-11-08','')}}
 ];
 
 /* ---------- editing detection ---------- */
@@ -892,6 +976,18 @@ function applyData(d){
   if(!data.meta.phaseStatus) data.meta.phaseStatus=clone(DEFAULT.meta.phaseStatus);
   PHASES.forEach(p=>{ if(!data.meta.phaseStatus[p.id]) data.meta.phaseStatus[p.id]='Not started'; });
   if(!data.meta.phaseOwners || typeof data.meta.phaseOwners!=='object') data.meta.phaseOwners=clone(DEFAULT.meta.phaseOwners);
+  // consolidated workstreams (8 × maturity gates) — seed + normalise
+  if(!Array.isArray(data.workstreams) || !data.workstreams.length) data.workstreams=clone(WS_DEFAULT);
+  data.workstreams.forEach(w=>{
+    if(typeof w.name!=='string') w.name='';
+    w.gov=!!w.gov;
+    if(!w.gates || typeof w.gates!=='object') w.gates={};
+    WS_PHASES.forEach(p=>{
+      const g=w.gates[p.key];
+      w.gates[p.key]=(g && typeof g==='object') ? {label:g.label||'',target:g.target||'',done:g.done||''} : G('','','');
+    });
+  });
+  if(typeof data.meta.progStart!=='string' || !data.meta.progStart) data.meta.progStart='2026-07-11';
   // one-time cleanup: strip the stray delete-button glyph (✕) that older builds saved into cell text
   if(scrubX(data)) scheduleSave();
   renderAll();
@@ -918,7 +1014,7 @@ function scheduleSave(){
 }
 
 /* ---------- Tabs / routing ---------- */
-const TABS=[["roadmap","Roadmap"],["discovery","Discovery"],["setup","Set Up"],["deployment","Deployment"],["golive","Go Live / Hypercare"],["bau","BAU"],["maturity","Process Maturity"],["performance","Performance"],["actions","Action Tracker"],["eow","EOW Report"]];
+const TABS=[["roadmap","Roadmap"],["tgantt","Gantt & SLA"],["discovery","Discovery"],["setup","Set Up"],["deployment","Deployment"],["golive","Go Live / Hypercare"],["bau","BAU"],["maturity","Process Maturity"],["performance","Performance"],["actions","Action Tracker"],["eow","EOW Report"]];
 function goTo(id){
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.id===id));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
@@ -1072,6 +1168,146 @@ function dtSLA(r){
   const met=days<=0;
   const sign=days>0?'+':'';
   return {txt:(met?'Met':'Missed')+' ('+sign+days+'d)', cls:met?'sla-met':'sla-miss'};
+}
+
+/* ---------- consolidated workstreams · maturity-gate Gantt & SLA ---------- */
+function parseD(s){ if(!s) return null; const d=new Date(s+'T00:00:00'); return isNaN(d)?null:d; }
+function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+function isoD(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+// SLA for a maturity gate: compares done vs target
+function gateSLA(g){
+  const t=parseD(g.target), d=parseD(g.done);
+  if(!d) return t?{txt:'Open',cls:'sla-none'}:{txt:'—',cls:'sla-none'};
+  if(!t) return {txt:'done',cls:'sla-none'};
+  const days=Math.round((d-t)/86400000), met=days<=0, sign=days>0?'+':'';
+  return {txt:(met?'Met':'Missed')+' ('+sign+days+'d)', cls:met?'sla-met':'sla-miss'};
+}
+function markCls(g){
+  if(!g.target) return null;
+  if(!g.done) return 'gm-open';
+  return (parseD(g.done)<=parseD(g.target)) ? 'gm-met' : 'gm-miss';
+}
+function addWorkstream(){
+  data.workstreams.push({name:'New workstream', gov:false, gates:{setup:G('','',''),deploy:G('','',''),hyper:G('','',''),opt:G('','','')}});
+  renderWorkstreams(); scheduleSave();
+}
+function renderWorkstreams(){
+  const internal = currentMode()==='internal';
+  // --- program-start control ---
+  const ps=document.getElementById('progStart');
+  if(ps){ ps.value=data.meta.progStart||''; ps.disabled=!internal;
+    ps.onchange=()=>{ data.meta.progStart=ps.value; renderWorkstreams(); scheduleSave(); }; }
+
+  // --- editable table ---
+  const head=document.getElementById('wsHead');
+  if(head){ head.innerHTML='';
+    const th0=document.createElement('th'); th0.style.width='190px'; th0.textContent='Workstream'; head.appendChild(th0);
+    WS_PHASES.forEach(p=>{ const th=document.createElement('th'); th.style.minWidth='190px';
+      th.innerHTML=p.name+'<br><small style="font-weight:400;color:var(--muted)">'+p.mat+'</small>'; head.appendChild(th); });
+  }
+  const body=document.getElementById('wsBody');
+  if(body){ body.innerHTML='';
+    data.workstreams.forEach(w=>{
+      const tr=document.createElement('tr');
+      // name cell
+      const nameTd=document.createElement('td'); nameTd.className='wscell';
+      const ns=document.createElement('span'); ns.className='edtext'; ns.textContent=w.name;
+      if(internal){ ns.contentEditable=true; ns.oninput=()=>{ w.name=ns.textContent; scheduleSave(); }; }
+      nameTd.appendChild(ns);
+      if(w.gov){ const tag=document.createElement('span'); tag.className='tag'; tag.textContent='governance'; tag.style.cssText='display:inline-block;margin-top:4px;font-size:9.5px;color:var(--green);background:var(--sky,#DBEAF4);padding:1px 6px;border-radius:5px;'; nameTd.appendChild(tag); }
+      if(internal){ addMove(nameTd, data.workstreams, w, renderWorkstreams); addDel(nameTd, ()=>{ data.workstreams.splice(data.workstreams.indexOf(w),1); renderWorkstreams(); }); }
+      tr.appendChild(nameTd);
+      // one cell per phase
+      WS_PHASES.forEach(p=>{
+        const g=w.gates[p.key];
+        const td=document.createElement('td'); td.className='wscell';
+        const lbl=document.createElement('span'); lbl.className='wslbl'; lbl.textContent=g.label||'—';
+        if(internal){ lbl.contentEditable=true; lbl.oninput=()=>{ g.label=lbl.textContent.trim(); scheduleSave(); }; }
+        td.appendChild(lbl);
+        // target date
+        const tw=document.createElement('div'); tw.className='wsgate'; tw.appendChild(document.createTextNode('Target'));
+        const ti=document.createElement('input'); ti.type='date'; ti.value=g.target||''; ti.disabled=!internal;
+        ti.onchange=()=>{ g.target=ti.value; renderWorkstreams(); scheduleSave(); }; tw.appendChild(ti); td.appendChild(tw);
+        // done date
+        const dw=document.createElement('div'); dw.className='wsgate'; dw.appendChild(document.createTextNode('Done'));
+        const di=document.createElement('input'); di.type='date'; di.value=g.done||''; di.disabled=!internal;
+        di.onchange=()=>{ g.done=di.value; renderWorkstreams(); scheduleSave(); }; dw.appendChild(di); td.appendChild(dw);
+        // SLA pill
+        const s=gateSLA(g); const pill=document.createElement('div'); pill.className=s.cls; pill.style.fontSize='11px'; pill.textContent='SLA: '+s.txt; td.appendChild(pill);
+        tr.appendChild(td);
+      });
+      body.appendChild(tr);
+    });
+  }
+
+  // --- summary chips ---
+  let met=0,miss=0,open=0;
+  data.workstreams.forEach(w=>WS_PHASES.forEach(p=>{ const g=w.gates[p.key]; if(!g.target) return;
+    if(!g.done) open++; else if(parseD(g.done)<=parseD(g.target)) met++; else miss++; }));
+  const sum=document.getElementById('wsSummary');
+  if(sum){ sum.innerHTML='';
+    [['Workstreams',data.workstreams.length],['Gates met',met],['At risk / open',open],['Missed',miss]].forEach((c,i)=>{
+      const d=document.createElement('div'); d.className='card'+(i===0?' feature':''); d.innerHTML='<div class="k">'+c[0]+'</div><div class="v">'+c[1]+'</div>'; sum.appendChild(d); });
+  }
+
+  renderWsGantt();
+}
+function renderWsGantt(){
+  const host=document.getElementById('wsGantt'); if(!host) return; host.innerHTML='';
+  const progStart=parseD(data.meta.progStart)||new Date();
+  // axis window: month-start of progStart → month-end of latest date (min progStart+120d)
+  let maxD=addDays(progStart,120);
+  data.workstreams.forEach(w=>WS_PHASES.forEach(p=>{ const g=w.gates[p.key];
+    [parseD(g.target),parseD(g.done)].forEach(d=>{ if(d&&d>maxD) maxD=d; }); }));
+  const axisStart=new Date(progStart.getFullYear(),progStart.getMonth(),1);
+  const axisEnd=new Date(maxD.getFullYear(),maxD.getMonth()+1,0);
+  const span=Math.max(1,axisEnd-axisStart);
+  const xp=d=>{ const v=(d-axisStart)/span*100; return Math.max(0,Math.min(100,v)); };
+  const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  // header row
+  const hdr=document.createElement('div'); hdr.className='ghdr';
+  const hn=document.createElement('div'); hn.className='gname'; hn.textContent='Workstream'; hdr.appendChild(hn);
+  const ax=document.createElement('div'); ax.className='gaxis';
+  const months=document.createElement('div'); months.className='gmonths';
+  let m=new Date(axisStart);
+  while(m<axisEnd){ const next=new Date(m.getFullYear(),m.getMonth()+1,1);
+    const el=document.createElement('div'); el.className='gmonth'; el.style.left=xp(m)+'%'; el.style.width=(xp(next>axisEnd?axisEnd:next)-xp(m))+'%';
+    el.textContent=MON[m.getMonth()]+' '+String(m.getFullYear()).slice(2); months.appendChild(el); m=next; }
+  ax.appendChild(months);
+  const weeks=document.createElement('div'); weeks.className='gweeks'; let wi=0;
+  for(let d=new Date(progStart); d<axisEnd; d=addDays(d,7)){ const el=document.createElement('div'); el.className='gweek'; el.style.left=xp(d)+'%'; el.textContent='W'+wi; weeks.appendChild(el); wi++; }
+  ax.appendChild(weeks); hdr.appendChild(ax); host.appendChild(hdr);
+
+  const today=new Date();
+  data.workstreams.forEach(w=>{
+    const row=document.createElement('div'); row.className='grow';
+    const nm=document.createElement('div'); nm.className='gname'; nm.innerHTML=w.name+(w.gov?'<small>governance</small>':''); row.appendChild(nm);
+    const track=document.createElement('div'); track.className='gtrack';
+    const gt=k=>parseD(w.gates[k].target);
+    const setupT=gt('setup'), deployT=gt('deploy'), hyperT=gt('hyper');
+    const bar=(cls,label,a,b)=>{ if(!a||!b||b<=a) return; const el=document.createElement('div'); el.className='gbar '+cls;
+      el.style.left=xp(a)+'%'; el.style.width=(xp(b)-xp(a))+'%'; el.textContent=label; el.title=label+' · '+isoD(a)+' → '+isoD(b); track.appendChild(el); };
+    bar('gb-setup','Setup',progStart,setupT);
+    bar('gb-deploy','Deployment',setupT||progStart,deployT);
+    bar('gb-hyper','Hypercare',deployT||setupT||progStart,hyperT);
+    const lastB=hyperT||deployT||setupT||progStart;
+    bar('gb-opt','Optimized',lastB,axisEnd);
+    // gate markers
+    WS_PHASES.forEach(p=>{ const g=w.gates[p.key]; const mc=markCls(g); if(!mc) return;
+      const t=parseD(g.target); const mk=document.createElement('div'); mk.className='gmark '+mc; mk.style.left='calc('+xp(t)+'% - 5px)';
+      const s=gateSLA(g); mk.title=p.key+' gate · target '+g.target+(g.done?(' · done '+g.done):'')+' · '+s.txt; track.appendChild(mk); });
+    // today line
+    if(today>=axisStart&&today<=axisEnd){ const tl=document.createElement('div'); tl.className='gtoday'; tl.style.left=xp(today)+'%'; tl.title='Today · '+isoD(today); track.appendChild(tl); }
+    row.appendChild(track); host.appendChild(row);
+  });
+
+  // legend
+  const leg=document.getElementById('wsLegend'); if(leg){ leg.innerHTML='';
+    const items=[['gb-setup','Setup'],['gb-deploy','Deployment'],['gb-hyper','Hypercare'],['gb-opt','Optimized']];
+    items.forEach(([c,t])=>{ const s=document.createElement('span'); s.innerHTML='<i class="'+c+'" style="background:'+({'gb-setup':'var(--teal)','gb-deploy':'#3f7d76','gb-hyper':'var(--green)','gb-opt':'var(--lavender)'}[c])+'"></i>'+t; leg.appendChild(s); });
+    [['#0a7d3c','met'],['#c9a227','open'],['#b23b1e','missed']].forEach(([c,t])=>{ const s=document.createElement('span'); s.innerHTML='<i class="dia" style="background:'+c+'"></i>'+t; leg.appendChild(s); });
+  }
 }
 
 /* ---------- About / Support library / Owner rollup ---------- */
@@ -2107,6 +2343,7 @@ function renderAll(){
   renderActions();
   renderRecaps();
   renderMaturity();
+  renderWorkstreams();
   renderGantt();
   renderEow();
   applyEowLock();
@@ -2142,6 +2379,7 @@ document.getElementById('btnEowLock').addEventListener('click',toggleEowLock);
 document.getElementById('recapFile').addEventListener('change',e=>{ const f=e.target.files[0]; if(f) handleRecapFile(f); e.target.value=''; });
 document.getElementById('btnAddAction').addEventListener('click',addActionRow);
 document.getElementById('btnAddFramework').addEventListener('click',addFramework);
+document.getElementById('btnAddWS').addEventListener('click',addWorkstream);
 document.getElementById('btnGenEow').addEventListener('click',renderEow);
 document.getElementById('btnCopyEow').addEventListener('click',copyEow);
 (function(){ const d=document.getElementById('recapDate'); if(d && !d.value) d.value=new Date().toISOString().slice(0,10); })();
