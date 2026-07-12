@@ -47,6 +47,11 @@
   .tab{font-family:var(--sansHead);font-weight:700;font-size:14px;color:#5b6b66;background:none;border:none;border-bottom:3px solid transparent;padding:12px 14px;cursor:pointer;}
   .tab:hover{color:var(--green);}
   .tab.active{color:var(--green);border-bottom-color:var(--green);}
+  .tabgroup{position:relative;display:inline-flex;}
+  .tabmenu{position:absolute;top:100%;left:0;z-index:40;background:#fff;border:1px solid #dfe6e3;border-radius:8px;box-shadow:0 8px 24px rgba(13,75,59,.14);padding:6px;min-width:210px;display:none;flex-direction:column;gap:2px;}
+  .tabmenu.open{display:flex;}
+  .tabitem{font-family:var(--sansHead);font-weight:600;font-size:13px;color:#3d4a46;background:none;border:none;text-align:left;padding:8px 12px;border-radius:6px;cursor:pointer;white-space:nowrap;}
+  .tabitem:hover{background:#f0f5f3;color:var(--green);}
 
   main{max-width:1360px;margin:0 auto;padding:28px 24px 80px;}
   .panel{display:none;}
@@ -362,8 +367,8 @@
     </div>
 
     <h3 class="block" data-hkey="master">Master timeline</h3>
-    <p class="note">The full delivery timeline now lives in one place — <b>Gantt &amp; SLA</b> — showing all eight workstreams across the maturity gates, with target dates and SLA tracking.</p>
-    <div style="margin:6px 0 4px"><button class="btn btn--ghost" id="btnGoGantt">Open Gantt &amp; SLA →</button></div>
+    <p class="note">The full delivery timeline now lives in one place — <b>Delivery Timeline</b> — showing all eight workstreams across the maturity gates, with target dates and SLA tracking.</p>
+    <div style="margin:6px 0 4px"><button class="btn btn--ghost" id="btnGoGantt">Open Delivery Timeline →</button></div>
 
     <div class="internal-only">
       <h3 class="block" data-hkey="support">Reference &amp; support library</h3>
@@ -719,7 +724,7 @@
       <button class="backlink" data-back>← Roadmap</button>
     </div>
     <p class="lead">One common governance language across all frameworks. Every capability moves through four levels — <b>Documented</b>, <b>Operationalized</b>, <b>Governed</b>, then <b>Optimized</b>. Tick the evidence as each is met; the level is awarded automatically once <em>all</em> criteria for that level (and the ones before it) are checked. <b>Governed</b> is the target — a capability at Governed is 100% mature; <b>Optimized</b> is the bonus stage for continuous improvement.</p>
-    <p class="note">This is the <b>evidence register</b> — the <em>whether, and how we know</em>: SOPs, success criteria, and owners behind each level. For the <em>when</em> — deadlines and SLA per gate — see <b>Gantt &amp; SLA</b>. Same four-rung ladder, two lenses. <button class="btn btn--ghost" id="btnGoTGantt" style="padding:2px 10px;font-size:12px;">Open Gantt &amp; SLA →</button></p>
+    <p class="note">This is the <b>evidence register</b> — the <em>whether, and how we know</em>: SOPs, success criteria, and owners behind each level. For the <em>when</em> — deadlines and SLA per gate — see <b>Delivery Timeline</b>. Same four-rung ladder, two lenses. <button class="btn btn--ghost" id="btnGoTGantt" style="padding:2px 10px;font-size:12px;">Open Delivery Timeline →</button></p>
 
     <h3 class="block">The model</h3>
     <div class="tablewrap">
@@ -743,7 +748,7 @@
   <!-- CONSOLIDATED GANTT & SLA -->
   <section class="panel" id="p-tgantt">
     <div class="phasehead">
-      <div><div class="eyebrow">Delivery · Workstreams × maturity gates</div><h2 class="section">Gantt &amp; SLA</h2></div>
+      <div><div class="eyebrow">Delivery · Workstreams × maturity gates</div><h2 class="section">Delivery Timeline</h2></div>
       <span class="spacer"></span>
       <button class="backlink" data-back>← Roadmap</button>
     </div>
@@ -1008,21 +1013,46 @@ function scheduleSave(){
 }
 
 /* ---------- Tabs / routing ---------- */
-const TABS=[["roadmap","Roadmap"],["tgantt","Gantt & SLA"],["discovery","Discovery"],["setup","Set Up"],["deployment","Deployment"],["golive","Go Live / Hypercare"],["bau","BAU"],["maturity","Process Maturity"],["performance","Performance"],["actions","Action Tracker"],["eow","EOW Report"]];
+const TABS=[["roadmap","Roadmap"],["tgantt","Delivery Timeline"],["discovery","Discovery"],
+  {group:"phases",label:"Delivery Phases",children:[["setup","Set Up"],["deployment","Deployment"],["golive","Go Live / Hypercare"],["bau","BAU"]]},
+  ["maturity","Process Maturity"],["performance","Performance"],["actions","Action Tracker"],["eow","EOW Report"]];
+const INTERNAL_TABS={performance:1,actions:1,eow:1};
 function goTo(id){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.id===id));
+  document.querySelectorAll('.tab').forEach(t=>{
+    const ids=(t.dataset.ids||t.dataset.id||'').split(',');
+    t.classList.toggle('active', ids.includes(id));
+  });
+  document.querySelectorAll('.tabmenu').forEach(m=>m.classList.remove('open'));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('p-'+id).classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
 }
 (function buildTabs(){
   const nav=document.getElementById('tabs'); nav.innerHTML='';
-  TABS.forEach(([id,label],i)=>{
-    const b=document.createElement('button');
-    b.className='tab'+(i===0?' active':'')+((id==='actions'||id==='eow'||id==='performance')?' internal-only':'')+(id==='eow'?' eow-gated':''); b.textContent=label; b.dataset.id=id;
-    b.onclick=()=>goTo(id);
-    nav.appendChild(b);
+  TABS.forEach((entry,i)=>{
+    if(entry.group){
+      const wrap=document.createElement('div'); wrap.className='tabgroup';
+      const b=document.createElement('button'); b.className='tab tabparent';
+      b.textContent=entry.label+' ▾'; b.dataset.ids=entry.children.map(c=>c[0]).join(',');
+      const menu=document.createElement('div'); menu.className='tabmenu';
+      entry.children.forEach(([id,label])=>{
+        const item=document.createElement('button');
+        item.className='tabitem'+(INTERNAL_TABS[id]?' internal-only':'');
+        item.textContent=label; item.dataset.id=id;
+        item.onclick=e=>{e.stopPropagation();goTo(id);};
+        menu.appendChild(item);
+      });
+      b.onclick=e=>{e.stopPropagation();const open=menu.classList.contains('open');document.querySelectorAll('.tabmenu').forEach(m=>m.classList.remove('open'));if(!open)menu.classList.add('open');};
+      wrap.appendChild(b); wrap.appendChild(menu); nav.appendChild(wrap);
+    } else {
+      const [id,label]=entry;
+      const b=document.createElement('button');
+      b.className='tab'+(i===0?' active':'')+(INTERNAL_TABS[id]?' internal-only':'')+(id==='eow'?' eow-gated':''); b.textContent=label; b.dataset.id=id;
+      b.onclick=()=>goTo(id);
+      nav.appendChild(b);
+    }
   });
+  document.addEventListener('click',()=>document.querySelectorAll('.tabmenu').forEach(m=>m.classList.remove('open')));
 })();
 document.getElementById('brandHome').addEventListener('click',()=>goTo('roadmap'));
 document.querySelectorAll('[data-back]').forEach(b=>b.addEventListener('click',()=>goTo('roadmap')));
